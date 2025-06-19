@@ -85,6 +85,40 @@ void files_set_linkerfile_outname(char * filename) {
 }
 
 
+// qsort compare rule function for linkerfile_order
+static int linkerfile_order_compare(const void* a, const void* b) {
+
+    // Sort by linkerfile_order [asc]
+    if (((file_order_t *)a)->linkerfile_order != ((file_order_t *)b)->linkerfile_order)
+        return (((file_order_t *)a)->linkerfile_order < ((file_order_t *)b)->linkerfile_order) ? QSORT_A_FIRST : QSORT_A_AFTER;
+    else
+        return QSORT_A_SAME;
+}
+
+// Set linkerfile order
+//
+// Helps ensure fixed bank areas (hopefully) get linked/placed before autobank.
+// Intended to facilitate alignment assumptions for size padded object files.
+// - Files that only have non-banked data ("_CODE", "_HOME") will always be first in the order
+// - See area_item_compare() for full details of how linkerfile_order gets set
+static void linkerfile_output_order_sort(const file_item * p_files, file_order_t * p_filelist_order, const uint32_t count) {
+
+    if (p_filelist_order && p_files) {
+        // Create sort-able list from list of files and their assigned linkerfile order
+        for (uint8_t c = 0; c < filelist.count; c++) {
+            p_filelist_order[c].file_id = c;
+            p_filelist_order[c].linkerfile_order = p_files[c].linkerfile_order;
+        }
+
+        // Sort the new list by linkerfile order
+        qsort (p_filelist_order, count, sizeof(file_order_t), linkerfile_order_compare);
+    } else {
+        printf("BankPack: ERROR: failed to allocate memory for sorting linkerfile output\n");
+        exit(EXIT_FAILURE);
+    }
+}
+
+
 // Writes a list of loaded object filenames to
 // a linkerfile (one filename per line)
 void files_write_linkerfile(void) {
@@ -92,13 +126,20 @@ void files_write_linkerfile(void) {
     file_item * files = (file_item *)filelist.p_array;
     FILE * out_file;
 
+    // Instead of sorting the file array itself, which would break references
+    // (i.e. "files[ areas[c].file_id ]."), create a sorted reference array to order the file output
+    file_order_t * filelist_order = malloc(filelist.count * sizeof(file_order_t));
+    linkerfile_output_order_sort(files, filelist_order, filelist.count);
+
     // Open the linkerfile output and write all object filenames
     out_file = fopen(g_out_linkerfile_name, "w");
     if (out_file) {
 
         // Process stored file names
-        for (c = 0; c < filelist.count; c++)
-            fprintf(out_file, "%s\n", files[c].name_out);
+        for (c = 0; c < filelist.count; c++) {
+            // printf("linkerfile out: c = %d : file_id = %d linkerfile_order = %d, name = %s\n", c, filelist_order[c].file_id,  filelist_order[c].linkerfile_order, files[ filelist_order[c].file_id ].name_out);
+            fprintf(out_file, "%s\n", files[ filelist_order[c].file_id ].name_out);
+        }
 
         fclose(out_file);
 
@@ -107,6 +148,9 @@ void files_write_linkerfile(void) {
         printf("BankPack: ERROR: failed to open output linkerfile: %s\n", g_out_linkerfile_name);
         exit(EXIT_FAILURE);
     }
+
+    if (filelist_order)
+        free(filelist_order);
 }
 
 
@@ -120,6 +164,7 @@ void files_add(char * filename) {
     newfile.name_out[0] = '\0';
     newfile.rewrite_needed = false;
     newfile.bank_num = BANK_NUM_UNASSIGNED;
+    newfile.linkerfile_order = LINKERFILE_ORDER_FIRST;  // This won't get changed for non-banked object files
 
     list_additem(&filelist, &newfile);
 }

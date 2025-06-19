@@ -370,14 +370,14 @@ static void banks_assign_area(area_item * p_area) {
 }
 
 
-#define QSORT_A_FIRST -1
-#define QSORT_A_SAME   0
-#define QSORT_A_AFTER  1
-
 // qsort compare rule function for sorting areas
 static int area_item_compare(const void* a, const void* b) {
 
-    // sort by bank [asc] (fixed vs auto-bank), then by size [desc]
+    // Sort:
+    // - First by bank num [asc] (implied fixed first, since fixed [0..254] < auto [255])
+    // - Then by size [desc]
+    //
+    // This assumes the autobank indicator (255) is larger than all fixed bank numbers (< 255)
     if (((area_item *)a)->bank_num_in != ((area_item *)b)->bank_num_in)
         return  (((area_item *)a)->bank_num_in < ((area_item *)b)->bank_num_in) ? QSORT_A_FIRST : QSORT_A_AFTER;
     else if (((area_item *)a)->size != ((area_item *)b)->size)
@@ -401,13 +401,18 @@ void obj_data_process(list_type * p_filelist) {
     symbol_item * symbols = (symbol_item *)symbollist.p_array;
     file_item   * files   = (file_item *)(p_filelist->p_array);
 
+    // Sort all areas (see function for sort order)
     areas_sort();
 
     // Assign areas to banks
     for (c = 0; c < arealist.count; c++) {
         banks_assign_area(&(areas[c]));
+        // Set linkerfile order based on sort order above
+        // The + 1 is to separate banked from non-banked files so non-banked always go first
+        // (non-banked files aren't passed into this function, so stay at default [0]) 
+        files[ areas[c].file_id ].linkerfile_order = c + 1;
 
-        // If areas was auto-banked then set bank number in associated file
+        // If area was auto-banked then set bank number in associated file 
         if ((areas[c].bank_num_in == BANK_NUM_AUTO) &&
             (areas[c].bank_num_out != BANK_NUM_UNASSIGNED)) {
 
