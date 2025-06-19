@@ -2,6 +2,10 @@
 #ifndef _COMMON_H
 #define _COMMON_H
 
+#define QSORT_A_FIRST -1
+#define QSORT_A_SAME   0
+#define QSORT_A_AFTER  1
+
 enum {
     MBC_TYPE_NONE = 0,
     MBC_TYPE_MBC1 = 1,
