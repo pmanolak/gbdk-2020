@@ -47,7 +47,10 @@ generate-assets:
 	# - GB
 	$(PNG2ASSET) $(RES)/largemap.png -c $(OUTDIR)/zgb_largemap_1.c -b 255 -map -use_structs -noflip
 	# - SMS/GG
-	$(PNG2ASSET) $(RES)/largemap.png -c $(OUTDIR)/zgb_largemap_2.c -b 255 -map -use_structs -noflip -pack_mode sms -bpp 4 -keep_palette_order
+	$(PNG2ASSET) $(RES)/largemap.png -c $(OUTDIR)/zgb_largemap_2.c -b 255 -map -use_structs -pack_mode sms -bpp 4 -keep_palette_order
+	$(PNG2ASSET) $(RES)/largemap.png -c $(OUTDIR)/zgb_largemap_3_attribs_smsgg.c -b 255 -map -use_structs -pack_mode sms -bpp 4 -keep_palette_order -use_map_attributes
+	# - GBC
+	$(PNG2ASSET) $(RES)/largemap.png -c $(OUTDIR)/zgb_largemap_4_attribs_gbc.c -b 255 -map -use_structs -keep_palette_order -use_map_attributes
 
 
 	# gb/duck =   -noflip
