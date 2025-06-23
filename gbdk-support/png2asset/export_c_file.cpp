@@ -165,12 +165,9 @@ static void export_c_tile_data(PNG2AssetData* assetData, FILE* file) {
             if((it + 1) != assetData->tiles.end() || (it2 + 1) != packed_data.end())
                 fprintf(file, ",");
             // Add a line break after each 8x8 tile
-            if(((line_break++) % (8 / assetData->args->bpp)) == 0)
+            if (((line_break++) % (8 * assetData->args->bpp)) == 0)
                 fprintf(file, "\n\t");
         }
-
-        if((!assetData->args->export_as_map) && (it != assetData->tiles.end()))
-            fprintf(file, "\n");
     }
     fprintf(file, "};\n\n");
 
