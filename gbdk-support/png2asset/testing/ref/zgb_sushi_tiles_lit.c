@@ -10,12 +10,11 @@
 BANKREF(zgb_sushi_tiles_lit)
 
 const palette_color_t zgb_sushi_tiles_lit_palettes[16] = {
-	RGB8( 24, 32, 40), RGB8( 48, 32, 56), RGB8( 80, 40, 56), RGB8(112, 48, 64), 
-	RGB8(120, 64, 88), RGB8(232,104,112), RGB8(248,168,112), RGB8(248,248,200), 
-	RGB8(200,168,112), RGB8(152,104, 56), RGB8(104, 72, 48), RGB8( 48, 40, 32), 
+	RGB8( 24, 32, 40), RGB8( 48, 32, 56), RGB8( 80, 40, 56), RGB8(112, 48, 64),
+	RGB8(120, 64, 88), RGB8(232,104,112), RGB8(248,168,112), RGB8(248,248,200),
+	RGB8(200,168,112), RGB8(152,104, 56), RGB8(104, 72, 48), RGB8( 48, 40, 32),
 	RGB8(  8, 32, 64), RGB8( 48, 40, 32), RGB8(  0,128,  0), RGB8(  0,192,  0)
-	
-};
+	};
 
 const uint8_t zgb_sushi_tiles_lit_tiles[2848] = {
 	0xff,0xff,0x00,0xff,0xff,0xff,0x00,0xff,0xff,0xff,0x00,0xff,0xff,0xff,0x00,0xff,0xff,0xff,0x00,0xff,0xff,0xff,0x00,0xff,0xff,0xff,0x00,0xff,0xff,0xff,0x00,0xff,

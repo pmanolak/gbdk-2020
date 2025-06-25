@@ -8,8 +8,7 @@ BANKREF(binout)
 
 const palette_color_t binout_palettes[4] = {
 	RGB8(255,254,245), RGB8(224,223,175), RGB8(172,182,127), RGB8( 63, 67, 40)
-	
-};
+	};
 const metasprite_t binout_metasprite0[] = {
 	METASPR_ITEM(-48, -28, 0, S_PAL(0)),
 	METASPR_ITEM(0, 8, 2, S_PAL(0)),

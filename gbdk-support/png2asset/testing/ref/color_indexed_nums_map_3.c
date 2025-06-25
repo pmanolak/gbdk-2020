@@ -7,15 +7,11 @@
 BANKREF(color_indexed_nums_map_3)
 
 const palette_color_t color_indexed_nums_map_3_palettes[16] = {
-	RGB8(253,207,207), RGB8(241,131,131), RGB8(231, 40, 40), RGB8( 76,  0,  0)
-	,
-	RGB8(187,210,247), RGB8( 77,171,255), RGB8( 35,129,235), RGB8(  9,  5, 88)
-	,
-	RGB8(190,255,210), RGB8(  0,237, 22), RGB8(  0,167, 15), RGB8( 10, 59,  2)
-	,
+	RGB8(253,207,207), RGB8(241,131,131), RGB8(231, 40, 40), RGB8( 76,  0,  0),
+	RGB8(187,210,247), RGB8( 77,171,255), RGB8( 35,129,235), RGB8(  9,  5, 88),
+	RGB8(190,255,210), RGB8(  0,237, 22), RGB8(  0,167, 15), RGB8( 10, 59,  2),
 	RGB8(253,253,139), RGB8(255,242,  0), RGB8(179,170,  0), RGB8( 75, 61,  2)
-	
-};
+	};
 
 const uint8_t color_indexed_nums_map_3_tiles[480] = {
 	0xff,0x00,0xff,0x3c,0xff,0x24,0xff,0x24,0xff,0x24,0xff,0x24,0xff,0x3c,0xff,0x00,
