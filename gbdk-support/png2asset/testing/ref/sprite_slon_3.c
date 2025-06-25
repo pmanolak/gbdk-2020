@@ -8,8 +8,7 @@ BANKREF(sprite_slon_3)
 
 const palette_color_t sprite_slon_3_palettes[4] = {
 	RGB8(255,255,255), RGB8(224,248,207), RGB8(134,192,108), RGB8(  7, 24, 33)
-	
-};
+	};
 const metasprite_t sprite_slon_3_metasprite0[] = {
 	METASPR_ITEM(-24, -24, 0, S_PAL(0)),
 	METASPR_ITEM(0, 8, 2, S_PAL(0)),

@@ -7,11 +7,9 @@
 BANKREF(color_nums_map_8)
 
 const palette_color_t color_nums_map_8_palettes[8] = {
-	RGB8(255,255,255), RGB8(255,242,  0), RGB8( 75, 61,  2), RGB8(  0,  0,  0)
-	,
+	RGB8(255,255,255), RGB8(255,242,  0), RGB8( 75, 61,  2), RGB8(  0,  0,  0),
 	RGB8(179,170,  0), RGB8( 75, 61,  2), RGB8(  0,  0,  0), RGB8(  0,  0,  0)
-	
-};
+	};
 
 const uint8_t color_nums_map_8_tiles[464] = {
 	0xff,0x00,0xff,0x00,0xb3,0x4c,0xad,0x52,0xad,0x52,0xad,0x52,0xf3,0x0c,0xff,0x00,

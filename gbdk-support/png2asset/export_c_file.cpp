@@ -120,31 +120,38 @@ static void export_c_palette_data(PNG2AssetData* assetData, FILE* file) {
         fprintf(file, "const palette_color_t %s_palettes[%d] = {\n", assetData->args->data_name.c_str(), (unsigned int)exportOpt.color_count);
         const size_t palette_start = exportOpt.color_start / assetData->image.colors_per_pal;
         const size_t total_palette_count = assetData->image.total_color_count / assetData->image.colors_per_pal;
-        for(size_t i = palette_start; i < total_palette_count; ++i)
-        {
-            if(i > palette_start)
-                fprintf(file, ",\n");
-            fprintf(file, "\t");
+        int cur_color = exportOpt.color_start;
 
+        fprintf(file, "\t");
+        for (size_t i = palette_start; i < total_palette_count; ++i)
+        {
             unsigned char* pal_ptr = &assetData->image.palette[i * (assetData->image.colors_per_pal * RGBA32_SZ)];
-            for(int c = 0; c < (int)assetData->image.colors_per_pal; ++c, pal_ptr += RGBA32_SZ)
+            for (int c = 0; c < (int)assetData->image.colors_per_pal; ++c, pal_ptr += RGBA32_SZ)
             {
                 size_t rgb222 = (((pal_ptr[2] >> 6) & 0x3) << 4) |
                     (((pal_ptr[1] >> 6) & 0x3) << 2) |
                     (((pal_ptr[0] >> 6) & 0x3) << 0);
-                if(assetData->args->convert_rgb_to_nes) {
+
+                if (assetData->args->convert_rgb_to_nes)
                     fprintf(file, "0x%0X", rgb_to_nes[rgb222]);
-                }
                 else
                     fprintf(file, "RGB8(%3d,%3d,%3d)", pal_ptr[0], pal_ptr[1], pal_ptr[2]);
-                if(c != (int)assetData->image.colors_per_pal - 1)
-                    fprintf(file, ", ");
-                // Line break every 4 color entries, to keep line width down
-                if(((c + 1) % 4) == 0)
+
+                // Trailing comma except for the last entry
+                if (cur_color < ((int)assetData->image.total_color_count - 1))
+                    fprintf(file, ",");
+
+                // Line break every 4 colors to keep line width down,
+                // otherwise a trailing space (except on the last color/array item)
+                if (((cur_color + 1) % 4) == 0)
                     fprintf(file, "\n\t");
+                else if (cur_color < ((int)assetData->image.total_color_count - 1))
+                    fprintf(file, " ");
+
+                cur_color++;
             }
         }
-        fprintf(file, "\n};\n");
+        fprintf(file, "};\n");
     }
 }
 
