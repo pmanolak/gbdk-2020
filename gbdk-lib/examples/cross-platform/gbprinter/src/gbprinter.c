@@ -28,12 +28,56 @@ start_print_pkt_t PRN_PKT_START = {
 static uint16_t printer_status;
 static uint8_t printer_tile_num;
 
+#if defined(NINTENDO)
 uint8_t printer_send_receive(uint8_t b) {
     SB_REG = b;
-    SC_REG = START_TRANSFER;
+    SC_REG = 0x81;
     while (SC_REG & 0x80);
     return SB_REG;
 }
+#elif defined(SEGA)
+// DPC0 = MISO
+// DPC1 = MOSI
+// DPC6 = CLK
+// GND  = GND
+uint8_t printer_send_receive(uint8_t data) NAKED PRESERVES_REGS(h, l, iyh, iyl) {
+    data;
+    __asm
+        ld e, #0b00000001
+        ld c, #_GG_EXT_CTL
+        out (c), e
+        ld c, #_GG_EXT_7BIT
+        out (c), e
+        ld b, #8
+1$:
+        rlca
+        rl e
+        rl e
+
+        res 7, e
+        res 6, e
+        out (c), e
+
+        ld d, b
+        ld b, #15
+2$:     djnz 2$
+
+        set 6, e
+        out (c), e
+
+        ld b, #8
+3$:     djnz 3$
+        ld b, d
+
+        in e, (c)
+        rrca
+        srl e
+        rla
+        djnz 1$
+        ret
+    __endasm;
+}
+#endif
 
 uint8_t printer_send_byte(uint8_t b) {
     return (uint8_t)(printer_status = ((printer_status << 8) | printer_send_receive(b)));
