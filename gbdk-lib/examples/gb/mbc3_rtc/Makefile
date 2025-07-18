@@ -12,10 +12,10 @@ LCC = $(GBDK_HOME)bin/lcc
 TARGETS= gb # gb pocket megaduck sms gg nes
 
 # Configure platform specific LCC flags here:
-LCCFLAGS_gb      =  -Wl-yt0x10 -Wm-ya4 # Set an MBC for banking (0x10: ROM+MBC3+RTC+RAM+BAT) with 4 cart SRAM banks
-LCCFLAGS_pocket  =  -Wl-yt0x10 -Wm-ya4 # Usually the same as required for .gb
-LCCFLAGS_duck    = # -Wl-yt0x10 -Wm-ya4 # Usually the same as required for .gb
-LCCFLAGS_gbc     =  -Wl-yt0x10 -Wm-ya4 -Wm-yc # Same as .gb with: -Wm-yc (gb & gbc) or Wm-yC (gbc exclusive)
+LCCFLAGS_gb      = -Wl-yt0x10 -Wm-ya4 # Set an MBC for banking (0x10: ROM+MBC3+RTC+RAM+BAT) with 4 cart SRAM banks
+LCCFLAGS_pocket  = -Wl-yt0x10 -Wm-ya4 # Usually the same as required for .gb
+LCCFLAGS_duck    =
+LCCFLAGS_gbc     = -Wl-yt0x10 -Wm-ya4 -Wm-yc # Same as .gb with: -Wm-yc (gb & gbc) or Wm-yC (gbc exclusive)
 LCCFLAGS_sms     =
 LCCFLAGS_gg      =
 LCCFLAGS_nes     =
@@ -23,13 +23,17 @@ LCCFLAGS_nes     =
 LCCFLAGS += $(LCCFLAGS_$(EXT)) # This adds the current platform specific LCC Flags
 
 LCCFLAGS += -Wl-j # -Wm-yS -Wm-yoA -Wm-ya4 -autobank -Wb-ext=.rel -Wb-v # MBC + Autobanking related flags
-# LCCFLAGS += -debug # Uncomment to enable debug output
-# LCCFLAGS += -v     # Uncomment for lcc verbose output
 LCCFLAGS += -Wf-MMD -Wf-Wp-MP # Header file dependency output (-MMD) for Makefile use + per-header Phony rules (-MP)
 CFLAGS += -Wf-MMD -Wf-Wp-MP # Header file dependency output (-MMD) for Makefile use + per-header Phony rules (-MP)
 
+# GBDK_DEBUG = ON
+ifdef GBDK_DEBUG
+	LCCFLAGS += -debug -v
+endif
+
 # You can set the name of the ROM file here
 PROJECTNAME = mbc3_rtc
+
 
 # EXT?=gb # Only sets extension to default (game boy .gb) if not populated
 SRCDIR      = src
