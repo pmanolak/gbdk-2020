@@ -23,13 +23,17 @@ LCCFLAGS_nes     =
 LCCFLAGS += $(LCCFLAGS_$(EXT)) # This adds the current platform specific LCC Flags
 
 LCCFLAGS += -Wl-j # -Wm-yS -Wm-yoA -Wm-ya4 -autobank -Wb-ext=.rel -Wb-v # MBC + Autobanking related flags
-# LCCFLAGS += -debug # Uncomment to enable debug output
-# LCCFLAGS += -v     # Uncomment for lcc verbose output
 LCCFLAGS += -Wf-MMD -Wf-Wp-MP # Header file dependency output (-MMD) for Makefile use + per-header Phony rules (-MP)
 CFLAGS += -Wf-MMD -Wf-Wp-MP # Header file dependency output (-MMD) for Makefile use + per-header Phony rules (-MP)
 
+# GBDK_DEBUG = ON
+ifdef GBDK_DEBUG
+	LCCFLAGS += -debug -v
+endif
+
 # You can set the name of the ROM file here
 PROJECTNAME = mbc5_rumble
+
 
 # EXT?=gb # Only sets extension to default (game boy .gb) if not populated
 SRCDIR      = src
