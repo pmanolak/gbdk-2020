@@ -12,38 +12,55 @@ const uint8_t shake_tbl[] = {0, P1, P1, P1, 0, N1, N1, N1};
 const uint8_t scanline_offsets_tbl[] = {0, 1, 2, 3, 3, 2, 1, 0, 0, 1, 2, 3, 3, 2, 1, 0};
 const uint8_t * scanline_offsets = scanline_offsets_tbl;
 
-#define SCROLL_POS 15
-#define SCROLL_POS_PIX_START ((SCROLL_POS + DEVICE_SCREEN_Y_OFFSET) * 8) - 2
-#define SCROLL_POS_PIX_END ((SCROLL_POS + DEVICE_SCREEN_Y_OFFSET + 1) * 8) - 1
+#define SCROLL_POS 15u
+#define SCROLL_HEIGHT 1u
+#define SCROLL_PIX_HEIGHT (SCROLL_HEIGHT * 8u)
+#define SCROLL_POS_PIX_START (((SCROLL_POS + DEVICE_SCREEN_Y_OFFSET) * 8u) - 2u)
+#define SCROLL_POS_PIX_END (((SCROLL_POS + DEVICE_SCREEN_Y_OFFSET) * 8u) + SCROLL_PIX_HEIGHT - 1u)
+
+inline void do_scroll(uint8_t x, uint8_t y) {
+#if defined(NINTENDO) || defined(NINTENDO_NES)
+    move_bkg(x, y);
+#elif defined(SEGA)
+    y;
+    __WRITE_VDP_REG_UNSAFE(VDP_RSCX, -x);    
+#endif
+}
+
+#if defined(SEGA)
+uint8_t LYC_REG = 0;  // define the fake LYC_REG, we will use it as the interrupt routine state
+
+void vblank_isr(void) {
+    __WRITE_VDP_REG_UNSAFE(VDP_RSCX, 0);
+    __WRITE_VDP_REG_UNSAFE(VDP_R10, SCROLL_POS_PIX_START);
+    LYC_REG = SCROLL_POS_PIX_START;
+}
+#endif
 
 uint8_t scroller_x = 0;
 void scanline_isr(void) {
-
-#if defined(NINTENDO) || defined(NINTENDO_NES)
     switch (LYC_REG) {
         case 0: 
-            SCX_REG = 0;
-            SCY_REG = 0;
+            do_scroll(0, 0);
             LYC_REG = SCROLL_POS_PIX_START;
             break;
         case SCROLL_POS_PIX_START:
-            SCX_REG = scroller_x;
-            SCY_REG = shake_tbl[(scroller_x >> 1) & 7];
+            do_scroll(scroller_x, shake_tbl[(scroller_x >> 1) & 7]);
+#if defined(SEGA)
+            __WRITE_VDP_REG_UNSAFE(VDP_R10, R10_INT_OFF); // disable scanline interrupts after the next triggerimg
+            VCOUNTER = 0xff;                              // retrigger the new (OFF) setting
+            while (VCOUNTER != SCROLL_POS_PIX_END);       // busywait for the end of the scanline effect
+            do_scroll(0, 0);
+#endif
             LYC_REG = SCROLL_POS_PIX_END;
             break;
         case SCROLL_POS_PIX_END:
-            SCX_REG = SCY_REG = LYC_REG = 0;
+#if defined(NINTENDO) || defined(NINTENDO_NES)
+            do_scroll(0, 0);
+            LYC_REG = 0;
+#endif
             break;
     }
-#elif defined(SEGA)
-    if (VCOUNTER == (SCROLL_POS_PIX_START - 8)) {
-        while (VCOUNTER != SCROLL_POS_PIX_START);
-        VDP_CMD = -scroller_x; VDP_CMD = VDP_RSCX;
-        while (VCOUNTER != SCROLL_POS_PIX_START + 8);
-    } else {
-        VDP_CMD = 0; VDP_CMD = VDP_RSCX;
-    }
-#endif
 }
 
 const uint8_t scroller_text[] = "This is a text scroller demo for GBDK-2020. You can use ideas, that are "\
@@ -69,12 +86,13 @@ void main(void) {
     CRITICAL {
         add_LCD(scanline_isr);
 #if defined(NINTENDO)
-        STAT_REG |= STATF_LYC; LYC_REG = 0;
+        STAT_REG |= STATF_LYC;
+#elif defined(SEGA)
+        add_VBL(vblank_isr);
+        __WRITE_VDP_REG_UNSAFE(VDP_R10, 0x07);
 #endif
+        LYC_REG = 0;
     }
-#if defined(SEGA)
-    __WRITE_VDP_REG(VDP_R10, 0x07);
-#endif
 #if defined(NINTENDO) || defined(NINTENDO_NES) || defined(SEGA)
     set_interrupts(VBL_IFLAG | LCD_IFLAG);
 #endif
@@ -87,7 +105,7 @@ void main(void) {
     
     set_vram_byte(scroller_vram_addr, *scroller_next_char - 0x20);
     
-    while (1) {
+    while (TRUE) {
         scroller_x++;
         if ((scroller_x & 0x07) == 0) {
             // next letter
