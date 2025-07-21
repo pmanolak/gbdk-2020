@@ -31,8 +31,8 @@ inline void do_scroll(uint8_t x, uint8_t y) {
 uint8_t LYC_REG = 0;  // define the fake LYC_REG, we will use it as the interrupt routine state
 
 void vblank_isr(void) {
-    __WRITE_VDP_REG_UNSAFE(VDP_RSCX, 0);
     __WRITE_VDP_REG_UNSAFE(VDP_R10, SCROLL_POS_PIX_START);
+    do_scroll(0, 0);
     LYC_REG = SCROLL_POS_PIX_START;
 }
 #endif
@@ -40,15 +40,16 @@ void vblank_isr(void) {
 uint8_t scroller_x = 0;
 void scanline_isr(void) {
     switch (LYC_REG) {
+#if defined(NINTENDO) || defined(NINTENDO_NES)
         case 0: 
             do_scroll(0, 0);
             LYC_REG = SCROLL_POS_PIX_START;
             break;
+#endif
         case SCROLL_POS_PIX_START:
             do_scroll(scroller_x, shake_tbl[(scroller_x >> 1) & 7]);
 #if defined(SEGA)
             __WRITE_VDP_REG_UNSAFE(VDP_R10, R10_INT_OFF); // disable scanline interrupts after the next triggerimg
-            VCOUNTER = 0xff;                              // retrigger the new (OFF) setting
             while (VCOUNTER != SCROLL_POS_PIX_END);       // busywait for the end of the scanline effect
             do_scroll(0, 0);
 #endif
@@ -59,6 +60,7 @@ void scanline_isr(void) {
             do_scroll(0, 0);
             LYC_REG = 0;
 #endif
+        default:
             break;
     }
 }
@@ -89,7 +91,6 @@ void main(void) {
         STAT_REG |= STATF_LYC;
 #elif defined(SEGA)
         add_VBL(vblank_isr);
-        __WRITE_VDP_REG_UNSAFE(VDP_R10, 0x07);
 #endif
         LYC_REG = 0;
     }
