@@ -220,14 +220,14 @@ inline uint8_t cancel_pending_interrupts(void) {
 }
 
 inline void move_bkg(uint8_t x, uint8_t y) {
-	__WRITE_VDP_REG(VDP_RSCX, -x);
-	__WRITE_VDP_REG(VDP_RSCY, y);
+    __WRITE_VDP_REG(VDP_RSCX, -x);
+    __WRITE_VDP_REG(VDP_RSCY, y);
 }
 
 inline void scroll_bkg(int8_t x, int8_t y) {
-	__WRITE_VDP_REG(VDP_RSCX, __READ_VDP_REG(VDP_RSCX) - x);
+    __WRITE_VDP_REG(VDP_RSCX, __READ_VDP_REG(VDP_RSCX) - x);
     int16_t tmp = __READ_VDP_REG(VDP_RSCY) + y;
-	__WRITE_VDP_REG(VDP_RSCY, (tmp < 0) ? 224 + tmp : tmp % 224u);
+    __WRITE_VDP_REG(VDP_RSCY, (tmp < 0) ? 224 + tmp : tmp % 224u);
 }
 
 /** HALTs the CPU and waits for the vertical blank interrupt.
@@ -251,14 +251,14 @@ void wait_vbl_done(void) PRESERVES_REGS(b, c, d, e, h, l, iyh, iyl);
     @see DISPLAY_ON
 */
 inline void display_off(void) {
-	__WRITE_VDP_REG(VDP_R1, __READ_VDP_REG(VDP_R1) &= (~R1_DISP_ON));
+    __WRITE_VDP_REG(VDP_R1, __READ_VDP_REG(VDP_R1) &= (~R1_DISP_ON));
 }
 
 /** Turns the display back on.
     @see display_off, DISPLAY_OFF
 */
 #define DISPLAY_ON \
-	__WRITE_VDP_REG(VDP_R1, __READ_VDP_REG(VDP_R1) |= R1_DISP_ON)
+    __WRITE_VDP_REG(VDP_R1, __READ_VDP_REG(VDP_R1) |= R1_DISP_ON)
 
 /** Turns the display off immediately.
     @see display_off, DISPLAY_ON
@@ -274,13 +274,13 @@ void refresh_OAM(void);
     @see SHOW_LEFT_COLUMN
 */
 #define HIDE_LEFT_COLUMN \
-	__WRITE_VDP_REG(VDP_R0, __READ_VDP_REG(VDP_R0) |= R0_LCB)
+    __WRITE_VDP_REG(VDP_R0, __READ_VDP_REG(VDP_R0) |= R0_LCB)
 
 /** Shows leftmost column
     @see HIDE_LEFT_COLUMN
 */
 #define SHOW_LEFT_COLUMN \
-	__WRITE_VDP_REG(VDP_R0, __READ_VDP_REG(VDP_R0) &= (~R0_LCB))
+    __WRITE_VDP_REG(VDP_R0, __READ_VDP_REG(VDP_R0) &= (~R0_LCB))
 
 /** Sets border color
  */
@@ -319,12 +319,12 @@ void refresh_OAM(void);
 /** Sets sprite size to 8x16 pixels, two tiles one above the other.
 */
 #define SPRITES_8x16 \
-	__WRITE_VDP_REG(VDP_R1, __READ_VDP_REG(VDP_R1) |= R1_SPR_8X16)
+    __WRITE_VDP_REG(VDP_R1, __READ_VDP_REG(VDP_R1) |= R1_SPR_8X16)
 
 /** Sets sprite size to 8x8 pixels, one tile.
 */
 #define SPRITES_8x8 \
-	__WRITE_VDP_REG(VDP_R1, __READ_VDP_REG(VDP_R1) &= (~R1_SPR_8X16))
+    __WRITE_VDP_REG(VDP_R1, __READ_VDP_REG(VDP_R1) &= (~R1_SPR_8X16))
 
 /** Macro returns TRUE if device supports color
  *  (it always does on SMS/GG)
