@@ -16,6 +16,8 @@ This section contains information that may be useful to know or important when u
     - Added @ref utility_makenes "makenes" utility for finalizing NES rom headers (called automatically by @ref lcc)
   - SMS/GG
     - Changed from unsigned (`uint16_t`) to signed int16 (`int16_t`) for coordinates with the family of `...metasprite...()` functions
+    - Changed screen map to be at `0x1800` instead of `0x3800`
+      - To switch to the older configuration use `__WRITE_VDP_REG_UNSAFE(VDP_R2, R2_MAP_0x3800);` and `__WRITE_VDP_REG_UNSAFE(VDP_R5, R5_SAT_0x3F00);` near the start of main
   - SDCC
     - Changed to using the `-N` flag with sdas since the the `-n` flag was removed
   - Changed @ref lcc to use `--no-optsdcc-in-asm` for building user programs and the GBDK library
