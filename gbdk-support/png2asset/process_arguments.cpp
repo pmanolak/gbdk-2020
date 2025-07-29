@@ -339,6 +339,7 @@ int processPNG2AssetArguments(int argc, char* argv[], PNG2AssetArguments* args) 
     args->output_filename_bin = args->output_filename.substr(0, dot_pos) + "_map.bin";
     args->output_filename_attributes_bin = args->output_filename.substr(0, dot_pos) + "_map_attributes.bin";
     args->output_filename_tiles_bin = args->output_filename.substr(0, dot_pos) + "_tiles.bin";
+    args->output_filename_palettes_bin = args->output_filename.substr(0, dot_pos) + "_palettes.bin";
     args->data_name = args->output_filename.substr(slash_pos + 1, dot_pos - 1 - slash_pos);
     replace(args->data_name.begin(), args->data_name.end(), '-', '_');
 

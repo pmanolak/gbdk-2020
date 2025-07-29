@@ -34,7 +34,7 @@ static exportOptions_t exportOpt;
 
 static void export_map_binary_tile_data(PNG2AssetData* assetData);
 static void export_map_binary_map_data(PNG2AssetData* assetData);
-
+static void export_map_binary_palette_data(PNG2AssetData* assetData);
 
 bool export_map_binary(PNG2AssetData* assetData) {
 
@@ -45,6 +45,9 @@ bool export_map_binary(PNG2AssetData* assetData) {
 
     if (assetData->args->includedMapOrMetaspriteData)
         export_map_binary_map_data(assetData);
+
+    if (assetData->args->include_palettes)
+        export_map_binary_palette_data(assetData);
 
     return true; // success
 }
@@ -117,4 +120,38 @@ static void export_map_binary_map_data(PNG2AssetData* assetData) {
     if (assetData->args->use_map_attributes && assetData->map_attributes.size()) {
         mapAttributesBinaryfile.close();
     }
+}
+
+static void export_map_binary_palette_data(PNG2AssetData* assetData) {
+
+    std::ofstream paletteBinaryFile;
+    paletteBinaryFile.open(assetData->args->output_filename_palettes_bin, std::ios_base::binary);
+
+    const size_t palette_start = exportOpt.color_start / assetData->image.colors_per_pal;
+    const size_t total_palette_count = assetData->image.total_color_count / assetData->image.colors_per_pal;
+    int cur_color = exportOpt.color_start;
+
+    for (size_t i = palette_start; i < total_palette_count; ++i)
+    {
+        unsigned char* pal_ptr = &assetData->image.palette[i * (assetData->image.colors_per_pal * RGBA32_SZ)];
+        for (int c = 0; c < (int)assetData->image.colors_per_pal; ++c, pal_ptr += RGBA32_SZ)
+        {
+            if (assetData->args->convert_rgb_to_nes) {
+                size_t rgb222 = (((pal_ptr[2] >> 6) & 0x3) << 4) |
+                                (((pal_ptr[1] >> 6) & 0x3) << 2) |
+                                (((pal_ptr[0] >> 6) & 0x3) << 0);
+                paletteBinaryFile.write((const char *)&rgb_to_nes[rgb222], sizeof(rgb_to_nes[0]));
+            } else {
+                // TODO: implement formats other than RGB555, depending on the pack mode
+                uint16_t rgb555 = (((pal_ptr[2] >> 3) & 0b00011111) << 10) |
+                                  (((pal_ptr[1] >> 3) & 0b00011111) << 5)  |
+                                  (((pal_ptr[0] >> 3) & 0b00011111) << 0);
+                paletteBinaryFile.write((const char *)&rgb555, sizeof(rgb555));
+            }
+
+            cur_color++;
+        }
+    }
+    // Finalize the files
+    paletteBinaryFile.close();
 }

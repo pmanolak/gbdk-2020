@@ -30,6 +30,7 @@ struct PNG2AssetArguments {
     string output_filename_bin;
     string output_filename_attributes_bin;
     string output_filename_tiles_bin;
+    string output_filename_palettes_bin;
     string data_name;
     string output_filename;
     string input_filename;
