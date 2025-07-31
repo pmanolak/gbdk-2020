@@ -235,6 +235,12 @@ void DrawTextAdvanced(char* text){
 
     while((c=text[index])!='\0'){
 
+        if(c<32) { // Skip non-printable characters instead of printing space for each one
+            index++;
+            if(c=='\n')
+                goto force_line_break;
+            continue;
+        }
         uint8_t vramTile = GetTileForCharacter(c);
 
         // If we haven't loaded this character into VRAM
@@ -264,7 +270,8 @@ void DrawTextAdvanced(char* text){
         columnSize++;
 
          // if we've reached the end of the row
-        if(BreakLineEarly(index,columnSize,text) || c=='.'){
+        if(BreakLineEarly(index,columnSize,text) ||c=='.'||c=='?'||c=='!'){
+            force_line_break:
 
             rowCount+=LINE_SKIP;
 
@@ -273,7 +280,7 @@ void DrawTextAdvanced(char* text){
 
             // If we just drew a period or question mark,
             // wait for the a button  and afterwards clear the dialogue box.
-            if(c=='.'||c=='?'){
+            if(c=='.'||c=='?'||c=='!'){
                 WaitForAButton();
                 ClearDialogueBox();
                 rowCount=0;
@@ -323,8 +330,8 @@ void DrawTextAdvanced(char* text){
             
             columnSize=0;
 
-            // If we just started a new line, skip spaces
-            while(text[index]==' '){
+            // If we just started a new line, skip spaces and other non-printable characters
+            while(text[index]>0 && text[index]<=32){
                 index++;
             }
         }
@@ -368,8 +375,7 @@ void main(void)
     while(TRUE){
 
         // We'll pass in one long string, but the game will present to the player multiple pages.
-        // By passing 3 as the final argument, the game boy will wait 3 frames between each character
-        DrawTextAdvanced("When the code reaches a period or question mark, it will pause and wait for you to press the A button for it to continue. Afterwards, It will start a new page and continue.  The code will automatically jump to a new line, when it cannot fully draw a word.  When both rows of text are full, the code will slide the current text upwards and continue. For every page, the code will dynamically populate VRAM. Only letters and characters used, will be loaded into VRAM.");
+        DrawTextAdvanced("When\n the code reaches a period, exclamation point or question mark, it will pause and wait for you to press the A button for it to continue.\n\n \nExclamation point!Question Mark?\n Afterwards, It will start a new page and continue.  The code will automatically jump to a new line, when it cannot fully draw a word.  When both rows of text are full, the code will slide the current text upwards and continue. For every page, the code will dynamically populate VRAM. Only letters and characters used, will be loaded into VRAM.");
         
     }
 }
