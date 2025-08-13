@@ -678,6 +678,7 @@ void update_value(uint8_t mode, uint8_t line, uint16_t value)
 	break;
       case PLAY: // restart
 	update_value(mode, FREQUENCY, current_value(mode, FREQUENCY));
+    if (soundReg->mode1.counter_ConsSel == 1) NR11_REG = NR11();
 	soundReg->mode1.restart = value;
 	NR14_REG = NR14();
 	soundReg->mode1.restart = 0;
@@ -731,6 +732,7 @@ void update_value(uint8_t mode, uint8_t line, uint16_t value)
 	break;
       case PLAY: // restart
 	update_value(mode, FREQUENCY, current_value(mode, FREQUENCY));
+    if (soundReg->mode2.counter_ConsSel == 1) NR21_REG = NR21();
 	soundReg->mode2.restart = value;
 	NR24_REG = NR24();
 	soundReg->mode2.restart = 0;
@@ -776,6 +778,7 @@ void update_value(uint8_t mode, uint8_t line, uint16_t value)
 	break;
       case PLAY: // restart
 	update_value(mode, FREQUENCY, current_value(mode, FREQUENCY));
+    if (soundReg->mode3.counter_ConsSel == 1) NR31_REG = NR31();    
 	soundReg->mode3.restart = value;
 	NR34_REG = NR34();
 	soundReg->mode3.restart = 0;
@@ -829,7 +832,8 @@ void update_value(uint8_t mode, uint8_t line, uint16_t value)
 	NR52_REG = NR52();
 	break;
       case PLAY: // restart
-	soundReg->mode4.restart = value;
+    if (soundReg->mode4.counter_ConsSel == 1) NR41_REG = NR41();
+    soundReg->mode4.restart = value;
 	NR44_REG = NR44();
 	soundReg->mode4.restart = 0;
 	break;
