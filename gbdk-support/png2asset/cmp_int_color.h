@@ -7,18 +7,29 @@ using namespace std;
 
 //Functor to compare entries in SetPal
 struct CmpIntColor {
+    // Values accessed as bytes here will be in ABGR8 byte array format. This is
+    // due to RGBA:32 packed ints being accessed as bytes on what is assumed to
+    // be a little-endian system.
+    // So, [3] = Red ... [0] = Alpha
+
     bool operator() (unsigned int const& c1, unsigned int const& c2) const
     {
         unsigned char* c1_ptr = (unsigned char*)&c1;
         unsigned char* c2_ptr = (unsigned char*)&c2;
 
         //Compare alpha first, transparent color is considered smaller
-        if(c1_ptr[0] != c2_ptr[0])
+        if(c1_ptr[ABGR8_ALPHA] != c2_ptr[ABGR8_ALPHA])
         {
-            return c1_ptr[0] < c2_ptr[0];
+            return c1_ptr[ABGR8_ALPHA] < c2_ptr[ABGR8_ALPHA];
         }
         else
         {
+            // If a color is fully transparent then consider it identical to any other
+            // fully transparent color and do not insert.
+            // If this test is reached then alpha channels are identical for the two entries
+            // and entry c1 is the one being tested for insertion.
+            if (c1_ptr[ABGR8_ALPHA] == ALPHA_FULLY_TRANSPARENT) return false;
+
             // Do a compare with luminance in upper bits, and original rgb24 in lower bits. 
             // This prefers luminance, but considers RGB values for equal-luminance cases to
             // make sure the compare functor satisifed the strictly weak ordering requirement
@@ -38,4 +49,4 @@ struct CmpIntColor {
 typedef set< unsigned int, CmpIntColor > SetPal;
 
 
-SetPal GetPaletteColors(const PNGImage& image, int x, int y, int w, int h);
+SetPal GetPaletteColors(const PNGImage& image, bool packModeSGB, int x, int y, int w, int h);

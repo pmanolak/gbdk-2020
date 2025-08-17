@@ -76,8 +76,11 @@ int FindOrCreateSubPalette(const SetPal& pal, vector< SetPal >& palettes, size_t
 //
 // Returns: array of attributes. This always has *per-tile* dimensions, even when half_resolution is true.
 //
-int* BuildPalettesAndAttributes(const PNGImage& image32, vector< SetPal >& palettes, bool half_resolution)
+int* BuildPalettesAndAttributes(const PNGImage& image32, PNG2AssetData* assetData)
 {
+    bool half_resolution = assetData->args->use_2x2_map_attributes;
+    vector< SetPal >& palettes = assetData->palettes;
+
     int* palettes_per_tile = new int[(image32.w / image32.tile_w) * (image32.h / image32.tile_h)];
     int sx = half_resolution ? 2 : 1;
     int sy = half_resolution ? 2 : 1;
@@ -85,8 +88,9 @@ int* BuildPalettesAndAttributes(const PNGImage& image32, vector< SetPal >& palet
     {
         for(unsigned int x = 0; x < image32.w; x += image32.tile_w * sx)
         {
-            //Get palette colors on (x, y, image32.tile_w, image32.tile_h)
-            SetPal pal = GetPaletteColors(image32, (x / sx) * sx, (y / sy) * sy, sx * image32.tile_w, sy * image32.tile_h);
+            // Get palette colors on (x, y, image32.tile_w, image32.tile_h)
+            const bool isPackModeSGB = assetData->args->pack_mode == Tile::SGB;
+            SetPal pal = GetPaletteColors(image32, isPackModeSGB, (x / sx) * sx, (y / sy) * sy, sx * image32.tile_w, sy * image32.tile_h);
 
             int subPalIndex = FindOrCreateSubPalette(pal, palettes, image32.colors_per_pal);
             if(subPalIndex < 0)
