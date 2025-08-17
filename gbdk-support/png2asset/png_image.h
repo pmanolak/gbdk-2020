@@ -18,6 +18,7 @@ using namespace std;
 #define RGBA8_ALPHA          3 // Alpha channel in [3]
 
 #define RGBA32(R,G,B,A) ((R << 24) | (G << 16) | (B << 8) | A)
+#define RGB24(R,G,B)    ((R << 16) | (G << 8) | B)
 
 #define ALPHA_FULLY_TRANSPARENT       0  // Full alpha channel transparency
 #define RGBA32_TRANSPARENT_WHITE      (RGBA32(255,255,255,ALPHA_FULLY_TRANSPARENT))  // White, full transparency

@@ -47,7 +47,7 @@ SetPal GetPaletteColors(const PNGImage& image, bool isPackModeSGB, int x, int y,
         for(int i = x; i < (x + w); ++i)
         {
             const unsigned char* color = &image.data[(j * image.w + i) * RGBA32_SZ];
-            int color_int = (color[0] << 24) | (color[1] << 16) | (color[2] << 8) | color[3];
+            int color_int = RGBA32(color[RGBA8_R], color[RGBA8_G], color[RGBA8_B], color[RGBA8_ALPHA]);
             ret.insert(color_int);
         }
     }

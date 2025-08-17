@@ -33,10 +33,10 @@ struct CmpIntColor {
             // Do a compare with luminance in upper bits, and original rgb24 in lower bits. 
             // This prefers luminance, but considers RGB values for equal-luminance cases to
             // make sure the compare functor satisifed the strictly weak ordering requirement
-            uint64_t lum_1 = (unsigned int)(c1_ptr[3] * 299 + c1_ptr[2] * 587 + c1_ptr[1] * 114);
-            uint64_t lum_2 = (unsigned int)(c2_ptr[3] * 299 + c2_ptr[2] * 587 + c2_ptr[1] * 114);
-            uint64_t rgb_1 = (c1_ptr[3] << 16) | (c1_ptr[2] << 8) | c1_ptr[1];
-            uint64_t rgb_2 = (c2_ptr[3] << 16) | (c2_ptr[2] << 8) | c2_ptr[1];
+            uint64_t lum_1 = (unsigned int)(c1_ptr[ABGR8_R] * 299 + c1_ptr[ABGR8_G] * 587 + c1_ptr[ABGR8_B] * 114);
+            uint64_t lum_2 = (unsigned int)(c2_ptr[ABGR8_R] * 299 + c2_ptr[ABGR8_G] * 587 + c2_ptr[ABGR8_B] * 114);
+            uint64_t rgb_1 = RGB24(c1_ptr[ABGR8_R], c1_ptr[ABGR8_G], c1_ptr[ABGR8_B]);
+            uint64_t rgb_2 = RGB24(c2_ptr[ABGR8_R], c2_ptr[ABGR8_G], c2_ptr[ABGR8_B]);
             uint64_t all_1 = (lum_1 << 24) | rgb_1;
             uint64_t all_2 = (lum_2 << 24) | rgb_2;
             return all_1 > all_2;
