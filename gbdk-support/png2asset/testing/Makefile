@@ -143,6 +143,7 @@ generate-assets:
 # SGB Border
 	$(PNG2ASSET) $(RES)/SGB/sgb_border.png -c $(OUTDIR)/sgb_border_1.c -map -bpp 4 -max_palettes 4 -pack_mode sgb -use_map_attributes
 	$(PNG2ASSET) $(RES)/SGB/sgb_border.png -c $(OUTDIR)/sgb_border_2.c -map -bpp 4 -max_palettes 4 -pack_mode sgb -use_map_attributes -no_palettes
+	$(PNG2ASSET) $(RES)/SGB/sgb_border_multi_pal.png -c $(OUTDIR)/sgb_border_multi_pal.c -map -bpp 4 -max_palettes 4 -pack_mode sgb -use_map_attributes
 
 # -bin output
 	$(PNG2ASSET) $(RES)/gameboy.png -c $(OUTDIR)/binout.1.bin -bin -tiles_only
