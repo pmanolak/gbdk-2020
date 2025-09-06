@@ -104,7 +104,7 @@ __standard_VBL_handler::
 _refresh_OAM::
         WAIT_STAT
         LD      A, #>_shadow_OAM
-        JP      .refresh_OAM + (.refresh_OAM_DMA - .start_refresh_OAM)
+        JP      .refresh_OAM_DMA
 
 .clear_WRAM:
         XOR     A
@@ -133,7 +133,7 @@ _set_interrupts::
         LDH     A,(__shadow_OAM_base)
         OR      A
         RET     Z
-.refresh_OAM_DMA:
+.start_refresh_OAM_DMA:
         LDH     (.DMA),A        ; Put A into DMA registers
         LD      A,#0x28         ; We need to wait 160 ns
 1$:
@@ -346,6 +346,8 @@ _add_VBL::
         ;; For malloc
         .area   _HEAP
         .area   _HEAP_END
+        ;; High RAM area
+        .area   _HRAM
 
         .area   _DATA
 __cpu::
@@ -360,11 +362,13 @@ _sys_time::
 .int_0x40::
         .blkw   0x06            ; 5 interrupt handlers: 1 built-in + 4 user-defined
 
-        .area   _HRAM (ABS)
-
-        .org    0xFF90
-__current_bank::        ; Current bank
-        .ds     0x01
+        .area   _HRAM
+.refresh_OAM::
+        .ds     (.start_refresh_OAM_DMA - .start_refresh_OAM)
+.refresh_OAM_DMA:
+        .ds     (.end_refresh_OAM - .start_refresh_OAM_DMA)
+__current_bank::
+        .ds     0x01            ; Current bank
 .vbl_done:
 __vbl_done::
         .ds     0x01            ; Is VBL interrupt finished?
