@@ -435,6 +435,9 @@ _sys_time::
         .ds     (.start_refresh_OAM_DMA - .start_refresh_OAM)
 .refresh_OAM_DMA:
         .ds     (.end_refresh_OAM - .start_refresh_OAM_DMA)
+
+        .bndry  0x10
+
 __current_bank::
         .ds     0x01            ; Current bank
 .vbl_done:
