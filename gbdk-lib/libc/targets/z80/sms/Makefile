@@ -31,6 +31,7 @@ ASSRC =	set_interrupts.s \
 	far_ptr.s \
 	gb_decompress.s \
 	rle_decompress.s \
+	zx0_decompress.s \
 	heap.s \
 	__sdcc_bcall.s \
 	crt0.s
