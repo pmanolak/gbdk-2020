@@ -31,7 +31,7 @@ _set_tile_submap_compat::
         dec sp
         pop af
         sub l
-        ld (.image_tile_width), a ; .image_tile_width contains corrected width
+        ld (.image_tile_width_compat), a ; .image_tile_width_compat contains corrected width
 
         push iy
 
