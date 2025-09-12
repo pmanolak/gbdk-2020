@@ -698,31 +698,26 @@ inline void set_bkg_attributes(uint8_t x, uint8_t y, uint8_t w, uint8_t h, const
     VBK_REG = VBK_TILES;
 }
 
-void set_tile_submap(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t map_w, const uint8_t *map) Z88DK_CALLEE;
-void set_tile_submap_compat(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t map_w, const uint8_t *map) Z88DK_CALLEE;
-inline void set_bkg_submap(uint8_t x, uint8_t y, uint8_t w, uint8_t h, const uint8_t *map, uint8_t map_w) {
-    set_tile_submap_compat(x, y, w, h, map_w, map);
-}
-inline void set_win_submap(uint8_t x, uint8_t y, uint8_t w, uint8_t h, const uint8_t *map, uint8_t map_w) {
-    set_tile_submap_compat(x, y, w, h, map_w, map);
-}
+void set_tile_submap(uint8_t x, uint8_t y, uint8_t w, uint8_t h, const uint8_t *map, uint8_t map_w) Z88DK_CALLEE;
+void set_tile_submap_compat(uint8_t x, uint8_t y, uint8_t w, uint8_t h, const uint8_t *map, uint8_t map_w) Z88DK_CALLEE;
+#define set_bkg_submap set_tile_submap_compat
+#define set_win_submap set_tile_submap_compat
 
 extern uint8_t _submap_tile_offset;
 inline void set_bkg_based_submap(uint8_t x, uint8_t y, uint8_t w, uint8_t h, const uint8_t *map, uint8_t map_w, uint8_t base_tile) {
     _submap_tile_offset = base_tile;
-    set_tile_submap_compat(x, y, w, h, map_w, map);
+    set_tile_submap_compat(x, y, w, h, map, map_w);
     _submap_tile_offset = 0;
 }
 inline void set_win_based_submap(uint8_t x, uint8_t y, uint8_t w, uint8_t h, const uint8_t *map, uint8_t map_w, uint8_t base_tile) {
     _submap_tile_offset = base_tile;
-    set_tile_submap_compat(x, y, w, h, map_w, map);
+    set_tile_submap_compat(x, y, w, h, map, map_w);
     _submap_tile_offset = 0;
 }
 
-inline void set_bkg_submap_attributes(uint8_t x, uint8_t y, uint8_t w, uint8_t h, const uint8_t *map, uint8_t map_w)
-{
+inline void set_bkg_submap_attributes(uint8_t x, uint8_t y, uint8_t w, uint8_t h, const uint8_t *map, uint8_t map_w) {
     VBK_REG = VBK_ATTRIBUTES;
-    set_bkg_submap(x, y, w, h, map, map_w);
+    set_tile_submap_compat(x, y, w, h, map, map_w);
     VBK_REG = VBK_TILES;
 }
 

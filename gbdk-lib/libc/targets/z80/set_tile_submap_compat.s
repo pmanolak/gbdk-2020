@@ -21,19 +21,19 @@ __submap_tile_offset::
 
         .area   _HOME
 
-; void set_tile_submap_compat(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t map_w, const uint8_t *map) __z88dk_callee __preserves_regs(iyh, iyl);
+; void set_tile_submap_compat(uint8_t x, uint8_t y, uint8_t w, uint8_t h, const uint8_t *map, uint8_t map_w) __z88dk_callee;
 _set_tile_submap_compat::
-        pop hl                  ; HL = ret
-        pop bc                  ; BC = YX
-        pop de                  ; DE = WH
+        pop iy                  ; IY = ret
+        pop bc                  ; BC = XY
+        pop hl                  ; HL = HW
+        pop de                  ; DE = data
 
         dec sp
         pop af
-        sub e
-        ld (.image_tile_width_compat), a ; .image_tile_width_compat contains corrected width
+        sub l
+        ld (.image_tile_width), a ; .image_tile_width contains corrected width
 
-        ex (sp), hl             ; HL = data
-        ex de, hl               ; HL = WH, DE = data
+        push iy
 
         push hl
         push de
