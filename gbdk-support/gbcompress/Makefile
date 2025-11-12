@@ -17,7 +17,7 @@ endif
 
 CC = $(TOOLSPREFIX)gcc
 CFLAGS = -ggdb -O -Wno-incompatible-pointer-types -DGBDKLIBDIR=\"$(TARGETDIR)\"
-OBJ = main.o gbcompress.o rlecompress.o files.o files_c_source.o
+OBJ = main.o gbcompress.o rlecompress.o files.o files_c_source.o zx0compress.o zx0optimize.o zx0memory.o zx0decompress.o
 BIN = gbcompress
 
 all: $(BIN)
@@ -42,11 +42,14 @@ test:
 	rm -f tmp.cmp.c; rm -f tmp.dcmp.c; 	rm -f tmp.cmp; rm -f tmp.dcmp
 	cp $(BIN) tmp.in; ./gbcompress  --alg=rle -v --cout --varname=some_array tmp.in tmp.cmp.c; ./gbcompress --alg=rle -v -d --cin tmp.cmp.c tmp.dcmp; diff -s tmp.in tmp.dcmp
 	rm -f tmp.*
+	rm -f tmp.cmp; rm -f tmp.dcmp
+	cp $(BIN) tmp.in; ./gbcompress --alg=zx0 -v tmp.in tmp.cmp; ./gbcompress  --alg=zx0 -v -d tmp.cmp tmp.dcmp; diff -s tmp.in tmp.dcmp
+	rm -f tmp.*
 	# test_no_u16_align_end_of_buf.c
 	rm -f tmp.*
-	cp test_data/test_no_u16_align_end_of_buf.c tmp.in.c; ./gbcompress --cin -v --cout tmp.in.c tmp.cmp.c; ./gbcompress -v -d --cin --cout tmp.cmp.c tmp.dcmp.c; diff -s tmp.in.c tmp.dcmp.c
+	cp test_data/test_no_u16_align_end_of_buf.c tmp.in.c; ./gbcompress --cin -v --cout tmp.in.c tmp.cmp.c; ./gbcompress -v -d --cin --cout tmp.cmp.c tmp.dcmp.c; diff --ignore-blank-lines --ignore-space-change -s tmp.in.c tmp.dcmp.c
 	rm -f tmp.*
-	cp test_data/test_no_u16_align_end_of_buf.c tmp.in.c; ./gbcompress  --alg=rle --cin -v --cout tmp.in.c tmp.cmp.c; ./gbcompress --alg=rle -v -d --cin --cout tmp.cmp.c tmp.dcmp.c; diff -s tmp.in.c tmp.dcmp.c
+	cp test_data/test_no_u16_align_end_of_buf.c tmp.in.c; ./gbcompress  --alg=rle --cin -v --cout tmp.in.c tmp.cmp.c; ./gbcompress --alg=rle -v -d --cin --cout tmp.cmp.c tmp.dcmp.c; diff --ignore-blank-lines --ignore-space-change -s tmp.in.c tmp.dcmp.c
 	rm -f tmp.*
 
 

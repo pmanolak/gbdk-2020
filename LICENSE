@@ -11,6 +11,10 @@ Q: What license information is required when distributing the compiled ROM (bina
 A: There is no requirement to include or credit any of the GBDK-2020 licenses or authors, although credit of GBDK-2020 is appreciated.
    This is different and separate from redistributing the GBDK-2020 dev environment itself (or the GBDK-2020 sources) which does require the licenses.
 
+If zx0 decompression from the GBDK library is used then credit should be included per the requirements of it's BSD 3-Clause license. See the LICENSE folder for details.
+
+
+
 
 ### GBDK Library & Makefiles, SDCC:
 GPLv2+LE (linking exception). Some files from SDCC, some from the historical GBDK that were originally LGPL and have been relicensed to GPLv2+LE (linking exception) to match the SDCC ones in 2022 by permission of original authors.
@@ -33,6 +37,10 @@ According to: http://sdcc.sourceforge.net/
 
 ### bankpack, ihxcheck, gbcompress, makecom:
 Public Domain. @bbbbbr is the original author
+
+
+### zx0 compression in gbcompress and library
+BSD 3-Clause, Einar Saukas
 
 
 ### png2asset:

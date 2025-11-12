@@ -14,10 +14,13 @@
 #include "files.h"
 #include "files_c_source.h"
 
+#include "zx0.h"
+
 #define MAX_STR_LEN     4096
 
 #define COMPRESSION_TYPE_GB        0
 #define COMPRESSION_TYPE_RLE_BLOCK 1
+#define COMPRESSION_TYPE_ZX0       2
 #define COMPRESSION_TYPE_DEFAULT   COMPRESSION_TYPE_GB
 
 char filename_in[MAX_STR_LEN] = {'\0'};
@@ -28,7 +31,7 @@ uint8_t * p_buf_out = NULL;
 
 bool opt_mode_compress    = true;
 bool opt_verbose          = false;
-bool opt_compression_type = COMPRESSION_TYPE_DEFAULT;
+int  opt_compression_type = COMPRESSION_TYPE_DEFAULT;
 bool opt_c_source_input   = false;
 bool opt_c_source_output  = false;
 char opt_c_source_output_varname[MAX_STR_LEN] = "var_name";
@@ -53,7 +56,7 @@ static void display_help(void) {
        "--cin    : Read input as .c source format (8 bit char ONLY, uses first array found)\n"
        "--cout   : Write output in .c / .h source format (8 bit char ONLY) \n"
        "--varname=<NAME> : specify variable name for c source output\n"
-       "--alg=<type>     : specify compression type: 'rle', 'gb' (default)\n"
+       "--alg=<type>     : specify compression type: 'zx0', 'rle', 'gb' (default)\n"
        "--bank=<num>     : Add Bank Ref: %d - %d (default is none, with --cout only)\n"
        "Example: \"gbcompress binaryfile.bin compressed.bin\"\n"
        "Example: \"gbcompress -d compressedfile.bin decompressed.bin\"\n"
@@ -95,6 +98,8 @@ int handle_args(int argc, char * argv[]) {
                 opt_compression_type = COMPRESSION_TYPE_GB;
             } else if (strstr(argv[i], "--alg=rle") == argv[i]) {
                 opt_compression_type = COMPRESSION_TYPE_RLE_BLOCK;
+            } else if (strstr(argv[i], "--alg=zx0") == argv[i]) {
+                opt_compression_type = COMPRESSION_TYPE_ZX0;
             } else if (strstr(argv[i], "-d") == argv[i]) {
                 opt_mode_compress = false;
             } else if (strstr(argv[i], "--bank=") == argv[i]) {
@@ -118,7 +123,6 @@ int handle_args(int argc, char * argv[]) {
             return true;
         }
     }
-
 
     return false;
 }
@@ -148,17 +152,28 @@ static int compress() {
     else
         p_buf_in =  file_read_into_buffer(filename_in, &buf_size_in);
 
-    // Allocate buffer output buffer same size as input
-    // It can grow more in gbdecompress_buf()
-    buf_size_out = buf_size_in;
-    p_buf_out = malloc(buf_size_out);
+    // ZX0 compression manages buffer allocation (avoid changing it to make potential later merges easier)
+    if (opt_compression_type != COMPRESSION_TYPE_ZX0) {
+        // Allocate buffer output buffer same size as input
+        // It can grow more in gbdecompress_buf()
+        buf_size_out = buf_size_in;
+        p_buf_out = malloc(buf_size_out);
 
-    if ((p_buf_in) && (p_buf_out) && (buf_size_in > 0)) {
+        if (!p_buf_out) return EXIT_FAILURE;
+    }
+
+
+    if ((p_buf_in) && (buf_size_in > 0)) {
 
         if (opt_compression_type == COMPRESSION_TYPE_GB)
             out_len = gbcompress_buf(p_buf_in, buf_size_in, &p_buf_out, buf_size_out);
         else if (opt_compression_type == COMPRESSION_TYPE_RLE_BLOCK)
             out_len = rlecompress_buf(p_buf_in, buf_size_in, &p_buf_out, buf_size_out);
+        else if (opt_compression_type == COMPRESSION_TYPE_ZX0) {
+            int delta_throwaway;
+            p_buf_out = zx0compress( zx0optimize(p_buf_in,  buf_size_in, ZX0_SKIP_NONE, ZX0_MAX_OFFSET),
+                                     p_buf_in, buf_size_in, ZX0_SKIP_NONE, ZX0_BACKWARD_OFF, ZX0_INVERT_MODE_ON, &out_len, &delta_throwaway);
+            }
         else
             return EXIT_FAILURE;
 
@@ -189,6 +204,18 @@ static int decompress() {
     uint32_t  buf_size_out = 0;
     uint32_t  out_len = 0;
     bool      result = false;
+
+    // ZX0 decompression source is pain integrate, so handle it separately
+    // allowing it to manage file open/close/etc
+    if (opt_compression_type == COMPRESSION_TYPE_ZX0) {
+        if ((opt_c_source_input) || (opt_c_source_output)) {
+            printf("gbcompress: ERROR: zx0 decompression not compatible with C Source input and output\n");
+            return EXIT_FAILURE;
+        }
+
+        zx0decompress(filename_in, filename_out);
+        return EXIT_SUCCESS;
+    }
 
     if (opt_c_source_input)
         p_buf_in =  file_read_c_input_into_buffer(filename_in, &buf_size_in);
