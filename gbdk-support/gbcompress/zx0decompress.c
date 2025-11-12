@@ -7,29 +7,31 @@
 #include <stdlib.h>
 #include <string.h>
 
+// #define STANDALONE_ZX0_DECOMPRESS
+
 #define BUFFER_SIZE 65536  /* must be > MAX_OFFSET */
 #define INITIAL_OFFSET 1
 
 #define FALSE 0
 #define TRUE 1
 
-FILE *ifp;
-FILE *ofp;
-char *input_name;
-char *output_name;
-unsigned char *input_data;
-unsigned char *output_data;
-size_t input_index;
-size_t output_index;
-size_t input_size;
-size_t output_size;
-size_t partial_counter;
-int bit_mask;
-int bit_value;
-int backtrack;
-int last_byte;
+static FILE *ifp;
+static FILE *ofp;
+static char *input_name;
+static char *output_name;
+static unsigned char *input_data;
+static unsigned char *output_data;
+static size_t input_index;
+static size_t output_index;
+static size_t input_size;
+static size_t output_size;
+static size_t partial_counter;
+static int bit_mask;
+static int bit_value;
+static int backtrack;
+static int last_byte;
 
-int read_byte() {
+static int read_byte() {
     if (input_index == partial_counter) {
         input_index = 0;
         partial_counter = fread(input_data, sizeof(char), BUFFER_SIZE, ifp);
@@ -43,7 +45,7 @@ int read_byte() {
     return last_byte;
 }
 
-int read_bit() {
+static int read_bit() {
     if (backtrack) {
         backtrack = FALSE;
         return last_byte & 1;
@@ -56,7 +58,7 @@ int read_bit() {
     return bit_value & bit_mask ? 1 : 0;
 }
 
-int read_interlaced_elias_gamma(int inverted) {
+static int read_interlaced_elias_gamma(int inverted) {
     int value = 1;
     while (!read_bit()) {
         value = value << 1 | read_bit() ^ inverted;
@@ -64,7 +66,7 @@ int read_interlaced_elias_gamma(int inverted) {
     return value;
 }
 
-void save_output() {
+static void save_output() {
     if (output_index != 0) {
         if (fwrite(output_data, sizeof(char), output_index, ofp) != output_index) {
             fprintf(stderr, "Error: Cannot write output file %s\n", output_name);
@@ -75,14 +77,14 @@ void save_output() {
     }
 }
 
-void write_byte(int value) {
+static void write_byte(int value) {
     output_data[output_index++] = value;
     if (output_index == BUFFER_SIZE) {
         save_output();
     }
 }
 
-void write_bytes(int offset, int length) {
+static void write_bytes(int offset, int length) {
     int i;
 
     if (offset > output_size+output_index) {
@@ -95,7 +97,7 @@ void write_bytes(int offset, int length) {
     }
 }
 
-void decompress(int classic_mode) {
+static void decompress(int classic_mode) {
     int last_offset = INITIAL_OFFSET;
     int length;
     int i;
@@ -148,6 +150,7 @@ COPY_FROM_NEW_OFFSET:
         goto COPY_LITERALS;
 }
 
+#ifdef STANDALONE_ZX0_DECOMPRESS
 int main(int argc, char *argv[]) {
     int forced_mode = FALSE;
     int classic_mode = FALSE;
@@ -189,6 +192,17 @@ int main(int argc, char *argv[]) {
                         "  -c      Classic file format (v1.*)\n", argv[0]);
         exit(1);
     }
+
+#else // Not in standalone mode
+
+int zx0decompress(char * filename_in, char * filename_out) {
+    int forced_mode = TRUE;
+    int classic_mode = FALSE;
+
+    input_name = filename_in;
+    output_name = filename_out;
+
+#endif
 
     /* open input file */
     ifp = fopen(input_name, "rb");

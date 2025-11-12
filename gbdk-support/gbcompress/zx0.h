@@ -28,6 +28,15 @@
 #define FALSE 0
 #define TRUE 1
 
+#define ZX0_SKIP_NONE 0
+#define ZX0_BACKWARD_OFF     FALSE
+#define ZX0_INVERT_MODE_ON   TRUE
+#define ZX0_CLASSIC_MODE_OFF FALSE
+
+#define ZX0_MAX_OFFSET    32640
+#define ZX7_MAX_OFFSET     2176
+
+
 typedef struct block_t {
     struct block_t *chain;
     struct block_t *ghost_chain;
@@ -41,6 +50,8 @@ BLOCK *allocate(int bits, int index, int offset, BLOCK *chain);
 
 void assign(BLOCK **ptr, BLOCK *chain);
 
-BLOCK *optimize(unsigned char *input_data, int input_size, int skip, int offset_limit);
+BLOCK *zx0optimize(unsigned char *input_data, int input_size, int skip, int offset_limit);
 
-unsigned char *compress(BLOCK *optimal, unsigned char *input_data, int input_size, int skip, int backwards_mode, int invert_mode, int *output_size, int *delta);
+// Decompression
+unsigned char *zx0compress(BLOCK *optimal, unsigned char *input_data, int input_size, int skip, int backwards_mode, int invert_mode, int *output_size, int *delta);
+int zx0decompress(char * filename_in, char * filename_out);
