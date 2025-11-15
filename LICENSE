@@ -39,7 +39,11 @@ According to: http://sdcc.sourceforge.net/
 Public Domain. @bbbbbr is the original author
 
 
-### zx0 compression in gbcompress and library
+### zx0 compression in gbcompress
+The zx0 salvador code is available under the Zlib license, except for matchfinder.c which is placed under the Creative Commons CC0 license.
+Please consult LICENSE.zlib.md and LICENSE.CC0.md for more information.
+
+### zx0 compression in the library
 BSD 3-Clause, Einar Saukas
 
 
