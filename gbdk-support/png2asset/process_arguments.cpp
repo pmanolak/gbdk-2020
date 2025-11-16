@@ -124,7 +124,7 @@ int processPNG2AssetArguments(int argc, char* argv[], PNG2AssetArguments* args) 
         printf("-keep_duplicate_tiles   do not remove duplicate tiles (default: not enabled)\n");
         printf("-no_palettes        do not export palette data\n");
 
-        printf("-bin                export to binary format\n");
+        printf("-bin                export to binary format (requires -map)\n");
         printf("-transposed         export transposed (column-by-column instead of row-by-row)\n");
 
         printf("-rel_paths          paths to tilesets are relative to the input file path\n");
@@ -345,6 +345,11 @@ int processPNG2AssetArguments(int argc, char* argv[], PNG2AssetArguments* args) 
 
     if ((args->area_specified == true) && (args->bank == BANK_NUM_UNSET)) {
         printf("Error: \"-area\" specified but bank number is missing. A bank number is required, use \"-b\"\n");
+        return EXIT_FAILURE;
+    }
+
+    if((args->output_binary) && (args->export_as_map == false)) {
+        printf("Error: \"-bin\" export mode only works when \"-map\" is enabled\n");
         return EXIT_FAILURE;
     }
 
