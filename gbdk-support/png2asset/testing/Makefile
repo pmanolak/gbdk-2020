@@ -26,6 +26,9 @@ compare-output:
 clean:
 	rm -rf $(OUTDIR)
 
+clean-ref:
+	rm -rf $(REF)
+
 reset-ref:
 	rm -rf $(REF)
 	git checkout $(REF)/*
@@ -146,9 +149,10 @@ generate-assets:
 	$(PNG2ASSET) $(RES)/SGB/sgb_border_multi_pal.png -c $(OUTDIR)/sgb_border_multi_pal.c -map -bpp 4 -max_palettes 4 -pack_mode sgb -use_map_attributes
 
 # -bin output
-	$(PNG2ASSET) $(RES)/gameboy.png -c $(OUTDIR)/binout.1.bin -bin -tiles_only
-	$(PNG2ASSET) $(RES)/gameboy.png -c $(OUTDIR)/binout.2.bin -bin -maps_only
-	$(PNG2ASSET) $(RES)/gameboy.png -c $(OUTDIR)/binout.3.bin -bin -maps_only -no_palettes
+	$(PNG2ASSET) $(RES)/gameboy.png -o $(OUTDIR)/binout_basic.bin         -map -bin
+	$(PNG2ASSET) $(RES)/gameboy.png -o $(OUTDIR)/binout_tileonly.bin      -map -bin -tiles_only
+	$(PNG2ASSET) $(RES)/gameboy.png -o $(OUTDIR)/binout_maponly.bin       -map -bin -maps_only
+	$(PNG2ASSET) $(RES)/gameboy.png -o $(OUTDIR)/binout_maponly-nopal.bin -map -bin -maps_only -no_palettes
 
 # -no_palettes
 	$(PNG2ASSET) $(RES)/no_pal_map_test.png -c $(OUTDIR)/no_pal_map_test_keep_pal_order.c -noflip -map -keep_palette_order -no_palettes
