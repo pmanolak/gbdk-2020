@@ -76,3 +76,6 @@ test-compare:
 
 test-reset-ref:
 	$(MAKE) -C testing reset-ref
+
+test-clean-ref:
+	$(MAKE) -C testing clean-ref
