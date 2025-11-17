@@ -28,6 +28,19 @@
 
 using namespace std;
 
+// Strip any leading path and slashes
+string str_remove_path(string str_in) {
+    size_t slash_pos = str_in.find_last_of('/');
+    if (slash_pos != str_in.npos)
+        str_in = str_in.substr(slash_pos, str_in.length() - slash_pos);
+
+    slash_pos = str_in.find_last_of('\\');
+    if (slash_pos != str_in.npos)
+        str_in = str_in.substr(slash_pos, str_in.length() - slash_pos);
+
+    return str_in;
+}
+
 int processPNG2AssetArguments(int argc, char* argv[], PNG2AssetArguments* args) {
 
     //default values for some params
@@ -82,6 +95,8 @@ int processPNG2AssetArguments(int argc, char* argv[], PNG2AssetArguments* args) 
     args->pack_mode = Tile::GB;
     args->map_entry_size_bytes = 1;
 
+    args->args_for_logging_to_output = "";
+
     args->relative_paths = false;
 
     if(argc < 2)
@@ -135,6 +150,11 @@ int processPNG2AssetArguments(int argc, char* argv[], PNG2AssetArguments* args) 
     args->input_filename = argv[1];
     args->output_filename = argv[1];
     args->output_filename = args->output_filename.substr(0, args->output_filename.size() - 4) + ".c";
+
+    // Save all args for logging into output files
+    for(int i = 1; i < argc; ++i) {
+        args->args_for_logging_to_output.append(" ").append( str_remove_path((string)argv[i]) );
+    }
 
     //Parse argv
     for(int i = 2; i < argc; ++i)
