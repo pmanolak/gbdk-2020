@@ -72,6 +72,8 @@ struct PNG2AssetArguments {
     bool has_entity_tileset;
     int processing_mode;  // Whether the current image being processed is a source tileset (MODE_SOURCE_TILESET), entity_tileset (MODE_ENTITY_TILESET), or the main image (MODE_MAIN_IMAGE)
 
+    string args_for_logging_to_output;
+
     Tile::PackMode pack_mode;
     int map_entry_size_bytes;
 
