@@ -28,6 +28,19 @@
 
 using namespace std;
 
+// Strip any leading path and slashes
+string str_remove_path(string str_in) {
+    size_t slash_pos = str_in.find_last_of('/');
+    if (slash_pos != str_in.npos)
+        str_in = str_in.substr(slash_pos, str_in.length() - slash_pos);
+
+    slash_pos = str_in.find_last_of('\\');
+    if (slash_pos != str_in.npos)
+        str_in = str_in.substr(slash_pos, str_in.length() - slash_pos);
+
+    return str_in;
+}
+
 int processPNG2AssetArguments(int argc, char* argv[], PNG2AssetArguments* args) {
 
     //default values for some params
@@ -82,6 +95,8 @@ int processPNG2AssetArguments(int argc, char* argv[], PNG2AssetArguments* args) 
     args->pack_mode = Tile::GB;
     args->map_entry_size_bytes = 1;
 
+    args->args_for_logging_to_output = "";
+
     args->relative_paths = false;
 
     if(argc < 2)
@@ -124,7 +139,7 @@ int processPNG2AssetArguments(int argc, char* argv[], PNG2AssetArguments* args) 
         printf("-keep_duplicate_tiles   do not remove duplicate tiles (default: not enabled)\n");
         printf("-no_palettes        do not export palette data\n");
 
-        printf("-bin                export to binary format\n");
+        printf("-bin                export to binary format (requires -map)\n");
         printf("-transposed         export transposed (column-by-column instead of row-by-row)\n");
 
         printf("-rel_paths          paths to tilesets are relative to the input file path\n");
@@ -135,6 +150,11 @@ int processPNG2AssetArguments(int argc, char* argv[], PNG2AssetArguments* args) 
     args->input_filename = argv[1];
     args->output_filename = argv[1];
     args->output_filename = args->output_filename.substr(0, args->output_filename.size() - 4) + ".c";
+
+    // Save all args for logging into output files
+    for(int i = 1; i < argc; ++i) {
+        args->args_for_logging_to_output.append(" ").append( str_remove_path((string)argv[i]) );
+    }
 
     //Parse argv
     for(int i = 2; i < argc; ++i)
@@ -345,6 +365,11 @@ int processPNG2AssetArguments(int argc, char* argv[], PNG2AssetArguments* args) 
 
     if ((args->area_specified == true) && (args->bank == BANK_NUM_UNSET)) {
         printf("Error: \"-area\" specified but bank number is missing. A bank number is required, use \"-b\"\n");
+        return EXIT_FAILURE;
+    }
+
+    if((args->output_binary) && (args->export_as_map == false)) {
+        printf("Error: \"-bin\" export mode only works when \"-map\" is enabled\n");
         return EXIT_FAILURE;
     }
 
