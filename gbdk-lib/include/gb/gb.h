@@ -995,7 +995,7 @@ uint8_t get_vram_byte(uint8_t * addr) PRESERVES_REGS(b, c, h, l);
 /**
  * Get address of X,Y tile of background map
  */
-uint8_t * get_bkg_xy_addr(uint8_t x, uint8_t y) OLDCALL PRESERVES_REGS(b, c);
+uint8_t * get_bkg_xy_addr(uint8_t x, uint8_t y) PRESERVES_REGS(h, l);
 
 #define COMPAT_PALETTE(C0,C1,C2,C3) ((uint8_t)(((C3) << 6) | ((C2) << 4) | ((C1) << 2) | (C0)))
 
@@ -1480,7 +1480,7 @@ inline void scroll_bkg(int8_t x, int8_t y) {
 /**
  * Get address of X,Y tile of window map
  */
-uint8_t * get_win_xy_addr(uint8_t x, uint8_t y) OLDCALL PRESERVES_REGS(b, c);
+uint8_t * get_win_xy_addr(uint8_t x, uint8_t y) PRESERVES_REGS(h, l);
 
 /** Sets VRAM Tile Pattern data for the Window / Background
 
