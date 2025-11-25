@@ -1220,6 +1220,8 @@ HTML_STYLESHEET        =
 # HTML_EXTRA_STYLESHEET    = "$(GBDKDOCSDIR)/config/github-markdown-theme/doxygen_extra.css"
 
 # Doxygen-Awesome theme
+# Need at least Doxygen 1.9.2 for the responsive mobile menu toggle
+# Per the docs 1.9.5 might have a compat issue
 #
 # These are set elsewhere:
 # GENERATE_TREEVIEW      = YES # optional. Also works without treeview
