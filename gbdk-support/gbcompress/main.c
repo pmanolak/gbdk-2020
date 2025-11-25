@@ -154,7 +154,10 @@ static int compress() {
 
     // Allocate buffer output buffer same size as input
     // It can grow more in gbdecompress_buf()
-    buf_size_out = buf_size_in;
+    if (opt_compression_type == COMPRESSION_TYPE_ZX0)
+        buf_size_out = salvador_get_max_compressed_size(buf_size_in);
+    else
+        buf_size_out = buf_size_in;
     p_buf_out = malloc(buf_size_out);
 
     if (!p_buf_out) return EXIT_FAILURE;
@@ -167,9 +170,9 @@ static int compress() {
         else if (opt_compression_type == COMPRESSION_TYPE_RLE_BLOCK)
             out_len = rlecompress_buf(p_buf_in, buf_size_in, &p_buf_out, buf_size_out);
         else if (opt_compression_type == COMPRESSION_TYPE_ZX0) {
-           // No Flags, no offset, no dictionary, no progress callback, no stats
+           // FLG_IS_INVERTED Flag, no offset, no dictionary, no progress callback, no stats
            memset(p_buf_out, 0, buf_size_out);
-           out_len = salvador_compress(p_buf_in, p_buf_out, buf_size_in, buf_size_out, 0, 0, 0, NULL, NULL);
+           out_len = salvador_compress(p_buf_in, p_buf_out, buf_size_in, buf_size_out, FLG_IS_INVERTED, 0, 0, NULL, NULL);
         } else
             return EXIT_FAILURE;
 
@@ -223,7 +226,7 @@ static int decompress() {
             out_len = rledecompress_buf(p_buf_in, buf_size_in, &p_buf_out, buf_size_out);
         else if (opt_compression_type == COMPRESSION_TYPE_ZX0) {
             memset(p_buf_out, 0, buf_size_out);            
-            out_len = salvador_decompress(p_buf_in, p_buf_out, buf_size_in, buf_size_out, 0, 0); // No dictionary, no flags
+            out_len = salvador_decompress(p_buf_in, p_buf_out, buf_size_in, buf_size_out, 0, FLG_IS_INVERTED); // No dictionary, FLG_IS_INVERTED Flag
         } else
             return EXIT_FAILURE;
 
