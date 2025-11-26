@@ -1,0 +1,102 @@
+diff --git a/src/config.xml.dist b/src/config.xml
+index cd19d72..e2c51a5 100644
+--- a/src/config.xml.dist
++++ b/src/config.xml
+@@ -3877,20 +3877,28 @@ UML notation for the relationships.
+ ]]>
+       </docs>
+     </option>
+     <option type='bool' id='DOT_CLEANUP' defval='1'>
+       <docs>
+ <![CDATA[
+ If the \c DOT_CLEANUP tag is set to \c YES, doxygen will
+ remove the intermediate files that are used to generate the various graphs.
+  <br>Note:
+ This setting is not only used for dot files but also for msc temporary files.
++]]>
++      </docs>
++    </option>
++    <option type='bool' id='USE_READABLE_ANCHORS' defval='0'>
++      <docs>
++<![CDATA[
++ If the \c USE_READABLE_ANCHORS tag is set to \c YES then anchor links (#)
++ will incorporate the method name instead of only the md5 hash.
+ ]]>
+       </docs>
+     </option>
+     <option type='obsolete' id='USE_WINDOWS_ENCODING'/>
+     <option type='obsolete' id='DETAILS_AT_TOP'/>
+     <option type='obsolete' id='QTHELP_FILE'/>
+     <option type='obsolete' id='QTHELP_CONFIG'/>
+     <option type='obsolete' id='DOXYGEN2QTHELP_LOC'/>
+     <option type='obsolete' id='MAX_DOT_GRAPH_WIDTH'/>
+     <option type='obsolete' id='MAX_DOT_GRAPH_HEIGHT'/>
+diff --git a/src/memberdef.cpp.dist b/src/memberdef.cpp
+index d0cb7da..a5d1924 100644
+--- a/src/memberdef.cpp.dist
++++ b/src/memberdef.cpp
+@@ -1619,20 +1619,24 @@ QCString MemberDefImpl::getReference() const
+   return "";
+ }
+ 
+ QCString MemberDefImpl::anchor() const
+ {
+   QCString result=m_impl->anc;
+   if (m_impl->groupAlias)     return m_impl->groupAlias->anchor();
+   if (m_impl->templateMaster) return m_impl->templateMaster->anchor();
+   if (m_impl->enumScope && m_impl->enumScope!=this) // avoid recursion for C#'s public enum E { E, F }
+   {
++    if (Config_getBool(USE_READABLE_ANCHORS))
++    {
++        result.replace(0, 3, ":");
++    }
+     result.prepend(m_impl->enumScope->anchor());
+   }
+   if (getGroupDef())
+   {
+     if (m_impl->groupMember)
+     {
+       result=m_impl->groupMember->anchor();
+     }
+     else if (getReference().isEmpty())
+     {
+@@ -4135,22 +4139,37 @@ void MemberDefImpl::setAnchor()
+   }
+   if (!m_impl->requiresClause.isEmpty())
+   {
+     memAnchor+=" "+m_impl->requiresClause;
+   }
+ 
+   // convert to md5 hash
+   uchar md5_sig[16];
+   char sigStr[33];
+   MD5Buffer((const unsigned char *)memAnchor.data(),memAnchor.length(),md5_sig);
+-  MD5SigToString(md5_sig,sigStr);
+-  m_impl->anc = QCString("a")+sigStr;
++
++  if (Config_getBool(USE_READABLE_ANCHORS))
++  {
++    // Copy function name into buffer, replace any non alpha with underscores
++    qsnprintf(sigStr,sizeof(sigStr),"%s",name().data());
++    char * pSigStr = sigStr;
++    size_t len = sizeof(sigStr) - 1;
++    while (pSigStr && (len-- > 0)) {
++        if (!isalnum(*pSigStr)) *pSigStr = '_';
++    }
++    m_impl->anc = sigStr;
++  }
++  else
++  {
++    MD5SigToString(md5_sig,sigStr);
++    m_impl->anc = QCString("a")+sigStr;
++  }
+ }
+ 
+ void MemberDefImpl::setGroupDef(const GroupDef *gd,Grouping::GroupPri_t pri,
+                             const QCString &fileName,int startLine,
+                             bool hasDocs,MemberDef *member)
+ {
+   //printf("%s MemberDefImpl::setGroupDef(%s)\n",qPrint(name()),qPrint(gd->name()));
+   m_impl->group=gd;
+   m_impl->grouppri=pri;
+   m_impl->groupFileName=fileName;

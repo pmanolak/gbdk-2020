@@ -39,9 +39,12 @@ GBDKDOCSDIR = $(TOPDIR)/docs
 GBDKLICENSEDIR = $(TOPDIR)/licenses
 
 # Doxygen command and version check info
+# Allow overriding doxygen with local explicit path
+ifndef DOXYGENCMD
 DOXYGENCMD = doxygen
-DOXYGEN_VER_REQ = 1.8.17
-DOXYGEN_VER_HAS = $(shell doxygen -v)
+endif
+DOXYGEN_VER_REQ = 1.9.2
+DOXYGEN_VER_HAS = $(shell $(DOXYGENCMD) -v)
 
 
 # Base setup
