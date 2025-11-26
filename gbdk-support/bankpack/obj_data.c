@@ -454,7 +454,7 @@ void banks_show(void) {
     uint32_t c;
     uint32_t a;
 
-    printf("\n=== Banks assigned: %d -> %d (allowed range %d -> %d). Max including fixed: %d) ===\n",
+    printf("\n== Banks assigned: %d -> %d (allowed %d -> %d). Max including fixed: %d) ==\n",
             bank_assigned_rom_min, bank_assigned_rom_max,
             bank_limit_rom_min,  bank_limit_rom_max,
             bank_assigned_rom_max_alltypes);
@@ -463,22 +463,30 @@ void banks_show(void) {
     area_item * areas = (area_item *)arealist.p_array;
     for (c = 0; c < banklist.count; c++) {
         if (banks[c].free != BANK_SIZE_ROM) {
-            printf("Bank %d: size=%5d, free=%5d, reserved=%5d\n", c, banks[c].size, banks[c].free, banks[c].reserved);
+            printf("Bank %d: Size=%5d, Free=%5d, Reserved=%5d\n", c, banks[c].size, banks[c].free, banks[c].reserved);
+            printf("     Area  Size  Bank in->out  File in->out\n");
             for (a = 0; a < arealist.count; a++) {
                 if (areas[a].bank_num_out == c) {
-                    printf(" +- Area: name=%8s, size=%5d, bank_in=%3d, bank_out=%3d, file=%s -> %s\n",
+                    printf(" %8s %5d    %3d -> %3d  ",
                         areas[a].name,
                         areas[a].size,
                         areas[a].bank_num_in,
-                        areas[a].bank_num_out,
-                        file_get_name_in_by_id(areas[a].file_id),
+                        areas[a].bank_num_out);
+
+                    // Split in/out files to separate lines if output would extend
+                    // beyond 80 chars (28 leading chars from print above, 4 for " -> ")
+                    bool no_line_break = ((strlen(file_get_name_in_by_id(areas[a].file_id)) +
+                                           strlen(file_get_name_out_by_id(areas[a].file_id)) + 4 + 28) <= 80);
+                    printf("%s%s-> %s\n",
+                        file_get_name_in_by_id(areas[a].file_id), 
+                        (no_line_break) ? " " : "\n                               ",
                         file_get_name_out_by_id(areas[a].file_id));
                 }
             }
+            // End of bank line break
+            printf("\n");
         }
     }
-
-    printf("\n");
 }
 
 
