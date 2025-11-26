@@ -1,8 +1,8 @@
-@page docs_rombanking_mbcs ROM/RAM Banking and MBCs
+@page docs_rombanking_mbcs ROM/SRAM Banking and MBCs
 
 
 
-# ROM/RAM Banking and MBCs (Memory Bank Controllers)
+# ROM/SRAM Banking and MBCs (Memory Bank Controllers)
 The standard Game Boy cartridge with no MBC has a fixed 32K bytes of ROM. In order to make cartridges with larger ROM sizes (to store more code and graphics) MBCs can be used. They allow switching between multiple ROM banks that use the same memory region. Only one of the banks can be selected as active at a given time, while all the other banks are inactive (and so, inaccessible).
 
 The majority of this section about banking is focused on the Game Boy since that is the original GBDK platform. Much of it still applies for the Game Gear(GG) and Sega Master System(SMS). For additional details about banking specifically related to these two systems see the @ref sms_gg_banking "SMS/GG Banking" section.
@@ -14,7 +14,7 @@ Cartridges with no MBC controller are non-banked, they have 32K bytes of fixed R
 ## MBC Banked cartridges (Memory Bank Controllers)
 @anchor MBC
 @anchor MBCS
-Cartridges with MBCs allow the the Game Boy to work with ROMS up to 8MB in size and with RAM up to 128kB. Each bank is 16K Bytes. The following are _usually_ true, with some exceptions:
+Cartridges with MBCs allow the the Game Boy to work with ROMS up to 8MB in size and with SRAM up to 128kB. Each ROM bank is 16K Bytes. The following are _usually_ true, with some exceptions:
   - Bank `0` of the ROM is located in the region at `0000h - 3FFFh`. It is fixed (non-banked) and cannot be switched out for another bank.
   - Banks `1 .. N` can be switched into the upper region at `4000h - 7FFFh`. The upper limit for `N` is determined by the MBC used and available cartridge space.
   - It is not necessary to manually assign Bank `0` for source files, that will happen by default if no bank is specified.
@@ -49,9 +49,9 @@ To assign code and constant data (such as graphics) to a ROM bank and use it:
 
 
 ## Setting the ROM bank for a Source file
-The ROM and RAM bank for a source file can be set in a couple different ways. Multiple different banks cannot be assigned inside the same source file (unless the `__addressmod` method is used), but multiple source files can share the same bank.
+The cart ROM bank for a source file can be set in a couple different ways. Multiple different banks cannot be assigned inside the same source file (unless the `__addressmod` method is used), but multiple source files can share the same bank.
 
-If no ROM and RAM bank are specified for a file then the default _CODE, _BSS and _DATA segments are used.
+If no ROM and SRAM bank are specified for a file then the default _CODE, _BSS and _DATA segments are used.
 
 Ways to set the ROM bank for a Source file:
   - `#pragma bank <N>` at the start of a source file. Example (ROM bank 2): `#pragma bank 2`
@@ -61,18 +61,19 @@ Ways to set the ROM bank for a Source file:
 Note: You can use the `NONBANKED` keyword to define a function as non-banked if it resides in a source file which has been assigned a bank.
 
 
-## Setting the RAM bank for a Source file
+## Setting the Cart SRAM bank for a Source file
   - `#pragma dataseg DATA_<N>` at the start of a source file. Example (Cartridge SRAM bank 3): `#pragma bank 3`
   - Using the lcc switch for Cartridge SRAM bank `-Wf-ba<N>`. Example (Cartridge SRAM bank 3): `-Wf-ba3`
 
 
 @anchor setting_mbc_and_rom_ram_banks
-## Setting the MBC and number of ROM & RAM banks available
+## Setting the MBC and number of Cart ROM & SRAM banks available
 
 At the link stage this is done with @ref lcc using pass-through switches for @ref makebin.
   - `-Wm-yo<N>` where `<N>` is the number of ROM banks. 2, 4, 8, 16, 32, 64, 128, 256, 512
     - `-Wm-yoA` may be used for automatic bank size.
-  - `-Wm-ya<N>` where `<N>` is the number of RAM banks. 2, 4, 8, 16, 32
+  - `-Wm-ya<N>` where `<N>` is the number of 8K Cart SRAM banks. 0, 1, 4, 16
+    - (corresponding to: None, 8K, 32K, 128K)
   - `-Wm-yt<N>` where `<N>` is the type of MBC cartridge (see chart below).
     - Example: `Wm-yt0x1A`
   - If passing the above arguments to @ref makebin directly **without** using @ref lcc, then the `-Wm` part should be omitted.
@@ -82,26 +83,26 @@ The MBC settings below are available when using the makebin `-Wl-yt<N>` switch.
 
 Source: Pandocs. Additional details available at [Pandocs](https://gbdev.io/pandocs/The_Cartridge_Header.html#0147---cartridge-type "Pandocs")
 
-For SMS/GG, the ROM file size must be at least 64K to enable mapper support for RAM banks in emulators.
+For SMS/GG, the ROM file size must be at least 64K to enable mapper support for Cart SRAM banks in emulators.
   - If the generated ROM is too small then `-yo 4` for makebin (or `-Wm-yo4` for LCC) can be used to set the size to 64K.
 
 
 ## MBC Type Chart
 ```
 0147: Cartridge type:
-0x00: ROM ONLY                  0x12: ROM+MBC3+RAM
-0x01: ROM+MBC1                  0x13: ROM+MBC3+RAM+BATT
-0x02: ROM+MBC1+RAM              0x19: ROM+MBC5
-0x03: ROM+MBC1+RAM+BATT         0x1A: ROM+MBC5+RAM
-0x05: ROM+MBC2                  0x1B: ROM+MBC5+RAM+BATT
-0x06: ROM+MBC2+BATTERY          0x1C: ROM+MBC5+RUMBLE
-0x08: ROM+RAM                   0x1D: ROM+MBC5+RUMBLE+SRAM
-0x09: ROM+RAM+BATTERY           0x1E: ROM+MBC5+RUMBLE+SRAM+BATT
-0x0B: ROM+MMM01                 0x1F: Pocket Camera
-0x0C: ROM+MMM01+SRAM            0x22: MBC7+ACCELEROMETER+EEPROM
-0x0D: ROM+MMM01+SRAM+BATT       0xFD: Bandai TAMA5
-0x0F: ROM+MBC3+TIMER+BATT       0xFE: Hudson HuC-3
-0x10: ROM+MBC3+TIMER+RAM+BATT   0xFF: Hudson HuC-1
+0x00: ROM ONLY                   0x12: ROM+MBC3+SRAM
+0x01: ROM+MBC1                   0x13: ROM+MBC3+SRAM+BATT
+0x02: ROM+MBC1+SRAM              0x19: ROM+MBC5
+0x03: ROM+MBC1+SRAM+BATT         0x1A: ROM+MBC5+SRAM
+0x05: ROM+MBC2                   0x1B: ROM+MBC5+SRAM+BATT
+0x06: ROM+MBC2+BATTERY           0x1C: ROM+MBC5+RUMBLE
+0x08: ROM+SRAM                   0x1D: ROM+MBC5+RUMBLE+SRAM
+0x09: ROM+SRAM+BATTERY           0x1E: ROM+MBC5+RUMBLE+SRAM+BATT
+0x0B: ROM+MMM01                  0x1F: Pocket Camera
+0x0C: ROM+MMM01+SRAM             0x22: MBC7+ACCELEROMETER+EEPROM
+0x0D: ROM+MMM01+SRAM+BATT        0xFD: Bandai TAMA5
+0x0F: ROM+MBC3+TIMER+BATT        0xFE: Hudson HuC-3
+0x10: ROM+MBC3+TIMER+SRAM+BATT   0xFF: Hudson HuC-1
 0x11: ROM+MBC3
 ```
 
@@ -147,13 +148,13 @@ For SMS/GG, the ROM file size must be at least 64K to enable mapper support for 
 
 3: No licensed cartridge makes use of this option. Exact behavior is unknown.
 
-4: MBC-3 with RAM size 64 KByte refers to MBC30, used only in Pocket Monsters Crystal Version for Japan.
+4: MBC-3 with SRAM size 64 KByte refers to MBC30, used only in Pocket Monsters Crystal Version for Japan.
 
 5: For MBC-1 the 32 K SRAM is only available for ROM sizes <= 512 K.
 
-6: MBC-2 uses integrated RAM with 512 x 4 bits, the upper 4 bits of each byte should be disregarded.
+6: MBC-2 uses integrated SRAM with 512 x 4 bits, the upper 4 bits of each byte should be disregarded.
 
-7: Additional RAM on the cartridge in the memory range of `0xA000 - 0xBFFF`. Contents do not persist after power-off unless the cart has `Battery Save`.
+7: Additional SRAM on the cartridge in the memory range of `0xA000 - 0xBFFF`. Contents do not persist after power-off unless the cart has `Battery Save`.
 
 8: With `Battery Save` the contents of the cartridge SRAM will persist after power-off. The electronic implementation on cart may vary, for example it may use FRAM or RAM backed with a coin cell battery.
 
@@ -209,11 +210,11 @@ Calling Convention:
   - For details see @ref banked_calling_convention "Banked Calling Convention"
 
 ## Const Data (Variables in ROM)
-Data declared as `const` (read only) will be stored in ROM in the bank associated with it's source file (if none is specified it defaults to Bank 0). If that bank is a switchable bank then the data is only accesible while the given bank is active.
+Data declared as `const` (read only) will be stored in ROM in the bank associated with it's source file (if none is specified it defaults to Bank 0). If that bank is a switchable bank then the data is only accessible while the given bank is active.
 
 
-## Variables in RAM
-@todo Variables in RAM
+## Variables in Cart SRAM
+@todo Variables in SRAM
 
 
 ## Far Pointers
