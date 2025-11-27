@@ -63,6 +63,7 @@ Note: You can use the `NONBANKED` keyword to define a function as non-banked if 
 
 ## Setting the Cart SRAM bank for a Source file
   - `#pragma dataseg DATA_<N>` at the start of a source file. Example (Cartridge SRAM bank 3): `#pragma bank 3`
+    - See the cross-platform `sram_banks` example
   - Using the lcc switch for Cartridge SRAM bank `-Wf-ba<N>`. Example (Cartridge SRAM bank 3): `-Wf-ba3`
 
 
@@ -83,8 +84,7 @@ The MBC settings below are available when using the makebin `-Wl-yt<N>` switch.
 
 Source: Pandocs. Additional details available at [Pandocs](https://gbdev.io/pandocs/The_Cartridge_Header.html#0147---cartridge-type "Pandocs")
 
-For SMS/GG, the ROM file size must be at least 64K to enable mapper support for Cart SRAM banks in emulators.
-  - If the generated ROM is too small then `-yo 4` for makebin (or `-Wm-yo4` for LCC) can be used to set the size to 64K.
+See the note about @ref gg_sms_cart_sram_info "enabling Cart SRAM and number of banks available for SMS/GG"
 
 
 ## MBC Type Chart
@@ -355,6 +355,7 @@ There are several projects in the GBDK 2020 examples folder which demonstrate di
 @anchor sms_gg_banking "SMS/GG Banking" section.
 # SMS/Game Gear Banking
 
+## ROM Banks
 The memory banking setup for SMS and Game Gear in GBDK is different than it is for the Game Boy. Instead of a single switchable bank in the `0x4000 - 0x7FFF` range, there are two switchable frames at different address ranges. The configuration is as follows:
 
 - Frame 0: Non-banked, at address `0x0000 - 0x3FFF`
@@ -370,6 +371,16 @@ The memory banking setup for SMS and Game Gear in GBDK is different than it is f
         
 Banked code and any pointers associated with it will only work correctly when active in Frame 1 (at `0x4000`), so it must use `CODE_<N>`. Graphics and other assets may go in either Frame 1 (at `0x4000`) or, if designed for it then Frame 2 (at `0x8000`).
 
+@anchor gg_sms_cart_sram_info "SMS/GG Cart SRAM info"
+## Cart SRAM Banks
+The maximum supported number of Cart SRAM banks for SMS/GG is 2. The size is 8K.
+  - Additional details in the SMS Power docs: https://www.smspower.org/Development/Mappers#RAMMapping
+
+For SMS/GG, the ROM file size must be at least 64K to enable mapper support for Cart SRAM banks in emulators.
+  - If the generated ROM is too small then `-yo 4` for makebin (or `-Wm-yo4` for LCC) can be used to set the size to 64K.
+  - If auto-banking is being used and Cart SRAM banks are specified then @ref makebin will auto-increase the ROM size to 64k to ensure
+
+
 ## Auto-Banking
 CODE and LIT cannot share the same bank number. For example, if `CODE` is assigned to `bank 3` then `LIT` cannot be in `bank 3` as well. 
 
@@ -381,3 +392,12 @@ CODE and LIT cannot share the same bank number. For example, if `CODE` is assign
 The bankpack option `-banktype=` may be used to set a bank to use specific type (`CODE` or `LIT`). This will take effect before bankpack tries to perform any bank assignment. For example: `-banktype=2:LIT` (or `-Wb-banktype=2:LIT` when used with @ref lcc) sets bank 2 to exclusively use type `LIT`.
 
 
+@anchor nes_banking "NES Banking" section.
+# NES Banking
+
+## ROM Banks
+To do
+
+@anchor nes_cart_sram_info "NES Cart SRAM info"
+## Cart SRAM Banks
+Cart SRAM is not currently supported for the NES
