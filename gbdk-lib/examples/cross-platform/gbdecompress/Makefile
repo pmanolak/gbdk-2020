@@ -58,6 +58,11 @@ OBJS        = $(CSOURCES:%.c=$(OBJDIR)/%.o) $(ASMSOURCES:%.s=$(OBJDIR)/%.o)
 # Builds all targets sequentially
 all: $(TARGETS)
 
+compile.bat: Makefile
+	@echo "REM Automatically generated from Makefile" > compile.bat
+	@make -sn | sed y/\\//\\\\/ | grep -v make >> compile.bat
+
+
 # Use png2asset to convert the png into C formatted metasprite data
 # -sh 48   : Sets sprite height to 48 (width remains automatic)
 # -spr8x16 : Use 8x16 hardware sprites

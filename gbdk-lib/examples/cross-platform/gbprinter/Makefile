@@ -61,6 +61,11 @@ CFLAGS += -I$(OBJDIR)
 # Builds all targets sequentially
 all: $(TARGETS)
 
+compile.bat: Makefile
+	@echo "REM Automatically generated from Makefile" > compile.bat
+	@make -sn | sed y/\\//\\\\/ | grep -v make >> compile.bat
+
+
 # Use png2asset to convert the png into C formatted map data
 # -c ...   : Set C output file
 # Convert metasprite .pngs in res/ -> .c files in obj/<platform ext>/src/

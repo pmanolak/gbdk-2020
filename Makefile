@@ -12,6 +12,8 @@ VER = 4.4.0
 
 PORTS=sm83 z80 mos6502
 PLATFORMS=gb ap duck gg sms msxdos nes
+EXAMPLE_DIRS=$(PLATFORMS)
+EXAMPLE_DIRS+= cross-platform megaduck
 
 # Prefix to add to the standard tools.  Usefull for a standard gcc
 # cross-compile.
@@ -279,10 +281,10 @@ gbdk-lib-install-platforms:
 gbdk-lib-install-examples:
 	@echo Installing Examples
 	@cp -r $(GBDKLIBDIR)/include $(GBDKLIBDIR)/examples $(BUILDDIR)
-	@for plat in $(PLATFORMS); do \
-		if [ -d "$(BUILDDIR)/examples/$$plat" ]; then \
-			echo Generating Examples compile.bat for $$plat; \
-			$(MAKE) -C $(BUILDDIR)/examples/$$plat compile.bat --no-print-directory; \
+	@for example_dir in $(EXAMPLE_DIRS); do \
+		if [ -d "$(BUILDDIR)/examples/$$example_dir" ]; then \
+			echo Generating Examples compile.bat for $$example_dir; \
+			$(MAKE) -C $(BUILDDIR)/examples/$$example_dir compile.bat --no-print-directory; \
 			echo; \
 		fi \
 	done
