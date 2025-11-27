@@ -9,6 +9,11 @@ Copyright (c) 2021 - 2025 jothepro
 */
 
 html {
+    /* Less game between content root level ol and ul lists and preceding block level element */
+    div > ol, div > ul {
+        margin-top: -0.50em;
+    }
+
     /* primary theme color. This will affect the entire websites color scheme: links, arrows, labels, ... */
     --primary-color: #1779c4;
     --primary-dark-color: #335c80;
@@ -2741,7 +2746,7 @@ a.anchorlink {
     margin-left: var(--spacing-small);
     color: var(--page-foreground-color) !important;
     text-decoration: none;
-    opacity: .15;
+    opacity: .50;
     display: none;
     transition: opacity var(--animation-duration) ease-in-out, color var(--animation-duration) ease-in-out;
 }
@@ -2756,7 +2761,7 @@ h3 a.anchorlink svg, h4 a.anchorlink svg {
 }
 
 a.anchorlink:hover {
-    opacity: .45;
+    opacity: .95;
 }
 
 h2:hover a.anchorlink, h1:hover a.anchorlink, h3:hover a.anchorlink, h4:hover a.anchorlink  {
