@@ -62,6 +62,11 @@ PNG2ASSET_BKG_SETTINGS_pocket=
 # Builds all targets sequentially
 all:  $(TARGETS)
 
+compile.bat: Makefile
+	@echo "REM Automatically generated from Makefile" > compile.bat
+	@make -sn | sed y/\\//\\\\/ | grep -v make >> compile.bat
+
+
 # Compile .c files in "src/" to .o object files
 $(OBJDIR)/%.o:	$(SRCDIR)/%.c
 	$(LCC) $(LCCFLAGS) $(CFLAGS) -I$(GENDIR) -c -o $@ $<
