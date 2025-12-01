@@ -1,0 +1,5 @@
+-noflip  -map
+   -keep_palette_order
+ -no_palettes
+
+

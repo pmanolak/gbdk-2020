@@ -157,3 +157,6 @@ generate-assets:
 # -no_palettes
 	$(PNG2ASSET) $(RES)/no_pal_map_test.png -c $(OUTDIR)/no_pal_map_test_keep_pal_order.c -noflip -map -keep_palette_order -no_palettes
 	$(PNG2ASSET) $(RES)/no_pal_map_test.png -c $(OUTDIR)/no_pal_map_test.c -noflip -map -no_palettes
+
+# -use_metafile
+	$(PNG2ASSET) $(RES)/no_pal_map_test.png -c $(OUTDIR)/no_pal_map_test_keep_pal_order_usemetafile.c -use_metafile
