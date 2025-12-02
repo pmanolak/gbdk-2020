@@ -3,6 +3,8 @@
         .area   _CODE
 
         .globl ___sdcc_bcall_ehl
+	.globl .mapper_page_set
+
 ;
 ; default trampoline to call banked functions
 ; Usage:
