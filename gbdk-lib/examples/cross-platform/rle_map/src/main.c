@@ -4,15 +4,19 @@
 
 #include <gbdk/rledecompress.h>
 
+#include <map.h>
+
+
 // The Tile data is not compressed
-INCBIN(map_tiles, "res/map_tiles.bin")
+INCBIN(map_tiles, "obj/all/map_tiles.bin")
+// INCBIN(map_tiles, INCPATH_PLAT)
 INCBIN_EXTERN(map_tiles)
 
 // The Map data is compressed using: gbcompress --alg=rle
 // The map is ordered in sequential columns 18 tiles high
 // so it's easy to load one entire screen column worth at a time.
-#define MAP_DATA_HEIGHT 18
-INCBIN(map_compressed, "res/map.bin.rle")
+#define MAP_DATA_HEIGHT (map_HEIGHT / map_TILE_H)
+INCBIN(map_compressed, "obj/all/map_map.bin.rle")
 INCBIN_EXTERN(map_compressed)
 
 uint8_t data[MAP_DATA_HEIGHT];  // Collision map buffer

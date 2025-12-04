@@ -5,7 +5,8 @@ RLE Decompress
 Demonstrates using rle_decompress to load a compressed tile map into vram.
 
 ## Map Data encoding
-The Tile Map is exported in binary format (one map entry per byte) and encoded in sequential **columns** 20 tiles high.
+The Tile Map is converted to binary format (one map entry per byte) and encoded in sequential **columns** 20 tiles high.
+- The column wise encoding is the `-transpose` option for `png2asset`
 
 The data is compressed using the `gbcompress` utility using the `--alg=rle` argument.
 
