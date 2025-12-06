@@ -6,6 +6,70 @@ https://github.com/gbdk-2020/gbdk-2020/releases
 
 # GBDK-2020 Release Notes
 
+## GBDK-2020 4.5.0
+  202x/xx
+  - SDCC
+    - Added HRAM area access for sm83
+    - Added `#pragma dataseg DATA_<N>` support for sm83 and z80 platforms
+    - [Patched SDCC Builds](https://github.com/gbdk-2020/gbdk-2020-sdcc/releases) with support for all platforms are used.
+    - See the [github workflow](https://github.com/gbdk-2020/gbdk-2020-sdcc/tree/main/.github/workflows) for details.
+  - Library
+    - Added ability to dynamically allocate HRAM variables for GB/AP/Duck
+    - Added zx0 decompression support: @ref zx0_decompress()
+    - Changed NULL definition in @ref types.h to match @ref stddef.h
+    - Fixed escaping `%` symbol in printf() and sprintf()
+    - GB/AP/Duck
+      - Improved @ref get_bkg_xy_addr(), @ref get_win_xy_addr()
+      - Improved performance for banked calls
+    - SMS/GG
+      - Changed GG "not interrrupt" link port control bit constant from `GGEXT_NINIT` to @ref GGEXT_NINT
+      - Remove broken and unused `FAST_DIV8` macro
+      - Removed legacy `___sdcc_bcall` trampoline
+      - Fixed parameter order of @ref set_tile_submap(), @ref set_tile_submap_compat()
+      - Fixed tilemap width not set correctly in @ref set_tile_submap_compat()
+    - NES
+      - Remove broken and unused `FAST_DIV8` macro
+  - Examples
+    - Added HRAM variable example for GB/AP/Duck
+    - Added SRAM bank example for new `#pragma dataseg DATA_<N>`
+    - Added MegaDuck and Game Gear support to Game Boy Printer example
+    - Added missing compile.bat for some examples
+    - Improved the Text Scroller example
+    - Improved RLE compress example to convert and compress map at build time
+    - Fixed Platformer example incorrectly using `-keep_duplicate_tiles` flag
+    - Fixed Text Advanced Dialogue example printing (Rodrigo Card)
+    - Game Boy
+      - Added MBC5 Rumble example (Ev3)
+      - Improved Rand example with fast modulo, triangle and bell curve distributions
+      - Fixed Sound example not writing length when length bit enabled and triggering channel
+    - MegaDuck
+      - Added MegaDuck Laptop Printer example
+    - SMS
+      - Added NMI handler example
+  - Toolchain / Utilities
+    - @ref utility_png2asset "png2asset"
+      - Added binary palette export for `-bin` mode
+      - Added logging of conversion arguments to `.c` and `.h` output files
+        - Path is stripped to avoid potential unwanted username/etc disclosure
+      - Added `-use_metafile` option to load arguments from `<inputfile>.meta`
+      - Changed to separate attribute array for `-use_map_attributes` + `-use_structs`  with SMS/GG
+      - Fixed broken transparency for SGB borders with more than one 16 color palette
+      - Fixed missing error for `-bin` requiring `-map`
+      - Fixed incorrect line breaks and trailing spaces in output
+    - @ref bankpack
+      - Changed Linkerfile output order to match packing order for use with asm .bndry alignment in rom banks
+        - First non-banked, then fixed bank, then auto-banked. Banknum ascending, size descending
+      - Improved bank assignment printout
+    - @ref utility_gbcompress "gbcompress"
+      - Added include guards for header file output (Rodrigo Card)
+      - Added zx0 compression and decompression mode: `--alg=zx0`
+    - @ref utility_romusage "romusage"
+      - Fixed missing error when filename not present
+  - Docs:
+    - Improved html style and mobile web formatting
+    - Various updates and improvements
+
+
 ## GBDK-2020 4.4.0
   2025/05
   - Includes SDCC version ~4.5.0 (15267) with GBDK-2020 patches for Z80 and NES
@@ -81,6 +145,7 @@ https://github.com/gbdk-2020/gbdk-2020/releases
       - Added MegaDuck Laptop model examples for keyboard, RTC and speech
   - Docs:
     - Added Cart SRAM Max Size to MBC Chart and clarify battery/save meaning
+    - Various updates and improvements
 
 
 ## GBDK-2020 4.3.0
@@ -124,7 +189,7 @@ https://github.com/gbdk-2020/gbdk-2020/releases
       - Added Game Gear registers and definitions
         - `GG_STATE`: @ref GGSTATE_STT, @ref GGSTATE_NJAP, @ref GGSTATE_NNTS
         - `GG_EXT_7BIT`
-        - `GG_EXT_CTL`: @ref GGEXT_NINIT
+        - `GG_EXT_CTL`: `GGEXT_NINIT`
         - `GG_SIO_SEND`
         - `GG_SIO_RECV`
         - `GG_SIO_CTL`: @ref SIOCTL_TXFL, @ref SIOCTL_RXRD, @ref SIOCTL_FRER, @ref SIOCTL_INT, @ref SIOCTL_TON, @ref SIOCTL_RON, @ref SIOCTL_BS0, @ref SIOCTL_BS1
@@ -359,7 +424,7 @@ https://github.com/gbdk-2020/gbdk-2020/releases
   - Building GBDK
     - Changed to target older version of macOS (10.10) when building for better compatibility
   - Platforms
-    - Added support for Mega Duck / Cougar Boy (`duck`). See @ref docs_supported_consoles
+    - Added support for MegaDuck / Cougar Boy (`duck`). See @ref docs_supported_consoles
   - Library
     - Added @ref memcmp()
     - Added @ref add_low_priority_TIM() function for timer interrupts which allow nesting for GB/CGB
