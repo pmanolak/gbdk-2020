@@ -4,6 +4,22 @@ This section contains information that may be useful to know or important when u
 
 # GBDK-2020 versions
 
+## Porting to GBDK-2020 4.5.0
+  - GBDK now requires ~SDCC 4.5.0 or higher with GBDK-2020 patches for the z80, sm83 and NES
+  - Build Host:
+    - Changed from building on MacOS 13 to MacOS 15 for 64 bit Intel
+    - Changed from building on Windows 2019 to 2022 for Intel
+  - SMS/GG
+    - Changed parameter order of @ref set_tile_submap(), @ref set_tile_submap_compat()
+    - Remove broken and unused `FAST_DIV8` macro
+    - Removed legacy `___sdcc_bcall trampoline`
+  - MegaDuck
+    - Renamed `DUCK_IO_CMD_PRINT_INIT_MAYBE_EXT_IO` to @ref DUCK_IO_CMD_PRINT_INIT_EXT_IO
+    - Removed`duck_io_printer_detected()`, `duck_io_printer_type()` and replaced them with  @ref duck_io_printer_query(), @ref duck_io_printer_last_status()
+  - png2asset
+    - Fixed missing error for `-bin` requiring `-map`
+
+
 ## Porting to GBDK-2020 4.4.0
   - GBDK now requires ~SDCC 4.5.0 or higher with GBDK-2020 patches for the z80 and NES
   - Build Host:

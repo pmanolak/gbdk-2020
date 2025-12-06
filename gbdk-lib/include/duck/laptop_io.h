@@ -89,7 +89,7 @@
 
 
 // Printer init reply related
-// Init Reply Bit.0
+// Init Reply Bits:1..0
 #define DUCK_IO_PRINTER_FAIL        0x00u
 #define DUCK_IO_PRINTER_TYPE_2_PASS 0x01u // Bit.1 = 0  // 13 x 12 byte packets + 1 x 5 or 6 byte packet (with CR and/or LF)
 #define DUCK_IO_PRINTER_TYPE_1_PASS 0x02u // Bit.1 = 1  // 3 x 12 byte packets + 118 non-packet bytes
@@ -165,11 +165,16 @@ bool duck_io_laptop_init(void);
 
 /** Returns status of MegaDuck Printer as last detected by duck_io_laptop_init() or duck_io_printer_query()
 
-    Returned unsigned 8 bit value will have:
-    \li @ref Bit 0: Printer Status. Mask with @ref DUCK_IO_PRINTER_INIT_OK
-    \li @ref Bit 1: Printer Type. Mask with @ref DUCK_IO_PRINTER_TYPE_MASK
+    Should be called immediately before trying to print
+
+    Returned unsigned 8 bit value will have Printer Type
+    and Status in bits 1..0
+
+    The resulting value will be cached and used for
+    any subsequent duck_io_printer_last_status() calls.
 
     @ref duck_io_laptop_init() must be called first
+    @see DUCK_IO_PRINTER_FAIL, DUCK_IO_PRINTER_TYPE_2_PASS, DUCK_IO_PRINTER_TYPE_1_PASS, DUCK_IO_PRINTER_MAYBE_BUSY    
 */
 uint8_t duck_io_printer_last_status(void);
 
@@ -178,15 +183,14 @@ uint8_t duck_io_printer_last_status(void);
 
     Should be called immediately before trying to print
 
-    Returned unsigned 8 bit value will have:
-    \li @ref Bit 0: Printer Status. Mask with @ref DUCK_IO_PRINTER_INIT_OK
-    \li @ref Bit 1: Printer Type. Mask with @ref DUCK_IO_PRINTER_TYPE_MASK
+    Returned unsigned 8 bit value will have Printer Type
+    and Status in bits 1..0
 
     The resulting value will be cached and used for
-    any subsequent duck_io_printer_detected() and 
-    duck_io_printer_type() calls.
+    any subsequent duck_io_printer_last_status() calls.
 
     @ref duck_io_laptop_init() must be called first
+    @see duck_io_printer_last_status(), DUCK_IO_PRINTER_FAIL, DUCK_IO_PRINTER_TYPE_2_PASS, DUCK_IO_PRINTER_TYPE_1_PASS, DUCK_IO_PRINTER_MAYBE_BUSY    
 */
 uint8_t duck_io_printer_query(void);
 

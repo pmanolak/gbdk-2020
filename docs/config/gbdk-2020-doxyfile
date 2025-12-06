@@ -13,6 +13,9 @@
 # TAG += value [value, ...]
 # Values that contain spaces should be placed between quotes (\" \").
 
+# Requires a patched build of doxygen (see patch in same folder)
+USE_READABLE_ANCHORS = YES
+
 #---------------------------------------------------------------------------
 # Project related configuration options
 #---------------------------------------------------------------------------
