@@ -542,6 +542,10 @@ Options:
                               0: vertical arrangement / horizontal mirroring
                               1: horizontal arrangement / vertical mirroring
   -b   Battery bit set (default: 0)
+  -a   Alternative nametable layout (default: 0)
+Arguments:
+  <in_file>      optional binary input file, '-' means stdin. (default: stdin)
+  <out_file>     optional .nes output file, '-' means stdout. (default: stdout)
 ```
 @anchor gbcompress-settings
 # gbcompress settings
@@ -556,7 +560,7 @@ Options
 --cin    : Read input as .c source format (8 bit char ONLY, uses first array found)
 --cout   : Write output in .c / .h source format (8 bit char ONLY) 
 --varname=<NAME> : specify variable name for c source output
---alg=<type>     : specify compression type: 'rle', 'gb' (default)
+--alg=<type>     : specify compression type: 'zx0', 'rle', 'gb' (default)
 --bank=<num>     : Add Bank Ref: 1 - 511 (default is none, with --cout only)
 Example: "gbcompress binaryfile.bin compressed.bin"
 Example: "gbcompress -d compressedfile.bin decompressed.bin"
@@ -604,9 +608,10 @@ usage: png2asset    <file>.png [options]
 -entity_tileset     (maps only) mark matching tiles counting from 255 down, entity patterns not exported
 -keep_duplicate_tiles   do not remove duplicate tiles (default: not enabled)
 -no_palettes        do not export palette data
--bin                export to binary format
+-bin                export to binary format (requires -map)
 -transposed         export transposed (column-by-column instead of row-by-row)
 -rel_paths          paths to tilesets are relative to the input file path
+-use_metafile       Read extra options from file <inputfile>.meta (file missing not an error)
 decoder error empty input buffer given to decoder. Maybe caused by non-existing file?
 ```
 @anchor png2hicolorgb-settings
@@ -659,7 +664,7 @@ Historical credits and info:
 # romusage settings
 ```
 romusage input_file.[map|noi|ihx|cdb|.gb[c]|.pocket|.duck|.gg|.sms] [options]
-version 1.3.1, by bbbbbr
+version 1.3.2, by bbbbbr
 
 Options
 -h  : Show this help
