@@ -1,3 +1,47 @@
+gbdk-4.5.0
+    - Library
+      - Added dynamic HRAM variable allocation for GB/AP/Duck
+      - Added zx0 decompression support for sm83, z80: zx0_decompress()
+      - Fixed escaping % symbol in printf() and sprintf()
+      - GB/AP/Duck
+        - Improved get_bkg_xy_addr(), get_win_xy_addr()
+        - Improved performance for banked calls
+      - SMS/GG
+        - Changed GG "not interrrupt" link port control bit constant from GGEXT_NINIT to GGEXT_NINT
+        - Removed legacy ___sdcc_bcall trampoline
+        - Fixed parameter order of set_tile_submap(), set_tile_submap_compat()
+        - Fixed tilemap width not set correctly in set_tile_submap_compat()
+      - NES/SMS/GG: Remove broken and unused FAST_DIV8 macro
+    - Examples
+      - Added HRAM variable example for GB/AP/Duck
+      - Added SRAM bank example for new #pragma dataseg DATA_<N>
+      - Added Game Boy MBC5 Rumble example
+      - Added SMS NMI handler example
+      - Added MegaDuck Laptop Printer example
+      - Added MegaDuck and Game Gear support to Game Boy Printer example
+      - Improved RLE compress example to convert and compress map at build time
+      - Fixed Platformer example incorrectly using -keep_duplicate_tiles flag
+      - Fixed Text Advanced Dialogue example printing
+      - Fixed Sound example not writing length when length bit enabled and triggering channel
+    - Toolchain / Utilities
+      - png2asset
+        - Added binary palette export for -bin mode
+        - Added logging of conversion arguments to .c and .h output files
+          - Path is stripped to avoid potential unwanted username/etc disclosure
+        - Added -use_metafile option to load arguments from <inputfile>.meta
+        - Changed to separate attribute array for -use_map_attributes + -use_structs with SMS/GG
+        - Fixed broken transparency for SGB borders with more than one 16 color palette
+        - Fixed missing error for -bin requiring -map
+        - Fixed incorrect line breaks and trailing spaces in output
+      - bankpack
+        - Changed Linkerfile output order to match packing order for use with asm .bndry alignment in rom banks
+        - Improved bank assignment printout
+      - gbcompress
+        - Added include guards for header file output (Rodrigo Card)
+        - Added zx0 compression and decompression mode: --alg=zx0
+      - romusage: Fixed missing error when filename not present
+    - Docs: Improved html style and mobile web formatting
+
 gbdk-4.4.0
     - Library
       - NES

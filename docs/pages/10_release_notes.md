@@ -7,15 +7,15 @@ https://github.com/gbdk-2020/gbdk-2020/releases
 # GBDK-2020 Release Notes
 
 ## GBDK-2020 4.5.0
-  202x/xx
+  2025/12
   - SDCC
     - Added HRAM area access for sm83
     - Added `#pragma dataseg DATA_<N>` support for sm83 and z80 platforms
     - [Patched SDCC Builds](https://github.com/gbdk-2020/gbdk-2020-sdcc/releases) with support for all platforms are used.
     - See the [github workflow](https://github.com/gbdk-2020/gbdk-2020-sdcc/tree/main/.github/workflows) for details.
   - Library
-    - Added ability to dynamically allocate HRAM variables for GB/AP/Duck
-    - Added zx0 decompression support: @ref zx0_decompress()
+    - Added dynamic HRAM variable allocation for GB/AP/Duck
+    - Added zx0 decompression support for sm83, z80 platforms: @ref zx0_decompress()
     - Changed NULL definition in @ref types.h to match @ref stddef.h
     - Fixed escaping `%` symbol in printf() and sprintf()
     - GB/AP/Duck
