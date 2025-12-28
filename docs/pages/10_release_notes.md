@@ -29,6 +29,7 @@ https://github.com/gbdk-2020/gbdk-2020/releases
       - Fixed tilemap width not set correctly in @ref set_tile_submap_compat()
     - NES
       - Remove broken and unused `FAST_DIV8` macro
+      - Fixed @ref fill_bkg_rect() screen edge wrap, now calls @ref set_bkg_tile_xy()
   - Examples
     - Added HRAM variable example for GB/AP/Duck
     - Added SRAM bank example for new `#pragma dataseg DATA_<N>`

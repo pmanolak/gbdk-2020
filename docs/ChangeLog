@@ -12,6 +12,7 @@ gbdk-4.5.0
         - Fixed parameter order of set_tile_submap(), set_tile_submap_compat()
         - Fixed tilemap width not set correctly in set_tile_submap_compat()
       - NES/SMS/GG: Remove broken and unused FAST_DIV8 macro
+      - NES: Fixed fill_bkg_rect() to wrap correctly at screen edges, now calls set_bkg_tile_xy()
     - Examples
       - Added HRAM variable example for GB/AP/Duck
       - Added SRAM bank example for new #pragma dataseg DATA_<N>
