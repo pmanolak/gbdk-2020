@@ -14,10 +14,13 @@
 #include "files.h"
 #include "files_c_source.h"
 
+#include "zx0/zx0_libsalvador.h"
+
 #define MAX_STR_LEN     4096
 
 #define COMPRESSION_TYPE_GB        0
 #define COMPRESSION_TYPE_RLE_BLOCK 1
+#define COMPRESSION_TYPE_ZX0       2
 #define COMPRESSION_TYPE_DEFAULT   COMPRESSION_TYPE_GB
 
 char filename_in[MAX_STR_LEN] = {'\0'};
@@ -28,7 +31,7 @@ uint8_t * p_buf_out = NULL;
 
 bool opt_mode_compress    = true;
 bool opt_verbose          = false;
-bool opt_compression_type = COMPRESSION_TYPE_DEFAULT;
+int  opt_compression_type = COMPRESSION_TYPE_DEFAULT;
 bool opt_c_source_input   = false;
 bool opt_c_source_output  = false;
 char opt_c_source_output_varname[MAX_STR_LEN] = "var_name";
@@ -53,7 +56,7 @@ static void display_help(void) {
        "--cin    : Read input as .c source format (8 bit char ONLY, uses first array found)\n"
        "--cout   : Write output in .c / .h source format (8 bit char ONLY) \n"
        "--varname=<NAME> : specify variable name for c source output\n"
-       "--alg=<type>     : specify compression type: 'rle', 'gb' (default)\n"
+       "--alg=<type>     : specify compression type: 'zx0', 'rle', 'gb' (default)\n"
        "--bank=<num>     : Add Bank Ref: %d - %d (default is none, with --cout only)\n"
        "Example: \"gbcompress binaryfile.bin compressed.bin\"\n"
        "Example: \"gbcompress -d compressedfile.bin decompressed.bin\"\n"
@@ -95,6 +98,8 @@ int handle_args(int argc, char * argv[]) {
                 opt_compression_type = COMPRESSION_TYPE_GB;
             } else if (strstr(argv[i], "--alg=rle") == argv[i]) {
                 opt_compression_type = COMPRESSION_TYPE_RLE_BLOCK;
+            } else if (strstr(argv[i], "--alg=zx0") == argv[i]) {
+                opt_compression_type = COMPRESSION_TYPE_ZX0;
             } else if (strstr(argv[i], "-d") == argv[i]) {
                 opt_mode_compress = false;
             } else if (strstr(argv[i], "--bank=") == argv[i]) {
@@ -118,7 +123,6 @@ int handle_args(int argc, char * argv[]) {
             return true;
         }
     }
-
 
     return false;
 }
@@ -150,16 +154,26 @@ static int compress() {
 
     // Allocate buffer output buffer same size as input
     // It can grow more in gbdecompress_buf()
-    buf_size_out = buf_size_in;
+    if (opt_compression_type == COMPRESSION_TYPE_ZX0)
+        buf_size_out = salvador_get_max_compressed_size(buf_size_in);
+    else
+        buf_size_out = buf_size_in;
     p_buf_out = malloc(buf_size_out);
 
-    if ((p_buf_in) && (p_buf_out) && (buf_size_in > 0)) {
+    if (!p_buf_out) return EXIT_FAILURE;
+
+
+    if ((p_buf_in) && (buf_size_in > 0)) {
 
         if (opt_compression_type == COMPRESSION_TYPE_GB)
             out_len = gbcompress_buf(p_buf_in, buf_size_in, &p_buf_out, buf_size_out);
         else if (opt_compression_type == COMPRESSION_TYPE_RLE_BLOCK)
             out_len = rlecompress_buf(p_buf_in, buf_size_in, &p_buf_out, buf_size_out);
-        else
+        else if (opt_compression_type == COMPRESSION_TYPE_ZX0) {
+           // FLG_IS_INVERTED Flag, no offset, no dictionary, no progress callback, no stats
+           memset(p_buf_out, 0, buf_size_out);
+           out_len = salvador_compress(p_buf_in, p_buf_out, buf_size_in, buf_size_out, FLG_IS_INVERTED, 0, 0, NULL, NULL);
+        } else
             return EXIT_FAILURE;
 
         if (out_len > 0) {
@@ -197,7 +211,11 @@ static int decompress() {
 
     // Allocate buffer output buffer 3x size of input
     // It can grow more in gbdecompress_buf()
-    buf_size_out = buf_size_in * 3;
+    if (opt_compression_type == COMPRESSION_TYPE_ZX0)
+        buf_size_out = salvador_get_max_decompressed_size(p_buf_in, buf_size_in, 0);  // No flags
+    else
+        buf_size_out = buf_size_in * 3;
+
     p_buf_out = malloc(buf_size_out);
 
     if ((p_buf_in) && (p_buf_out) && (buf_size_in > 0)) {
@@ -206,7 +224,10 @@ static int decompress() {
             out_len = gbdecompress_buf(p_buf_in, buf_size_in, &p_buf_out, buf_size_out);
         else if (opt_compression_type == COMPRESSION_TYPE_RLE_BLOCK)
             out_len = rledecompress_buf(p_buf_in, buf_size_in, &p_buf_out, buf_size_out);
-        else
+        else if (opt_compression_type == COMPRESSION_TYPE_ZX0) {
+            memset(p_buf_out, 0, buf_size_out);            
+            out_len = salvador_decompress(p_buf_in, p_buf_out, buf_size_in, buf_size_out, 0, FLG_IS_INVERTED); // No dictionary, FLG_IS_INVERTED Flag
+        } else
             return EXIT_FAILURE;
 
         if (out_len > 0) {

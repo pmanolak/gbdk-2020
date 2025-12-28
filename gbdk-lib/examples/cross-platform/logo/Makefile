@@ -4,8 +4,8 @@ ifndef GBDK_HOME
 	GBDK_HOME = ../../../
 endif
 
-LCC = $(GBDK_HOME)bin/lcc
-PNG2ASSETS = $(GBDK_HOME)bin/png2asset
+LCC = $(GBDK_HOME)/bin/lcc
+PNG2ASSETS = $(GBDK_HOME)/bin/png2asset
 
 # Set platforms to build here, spaced separated. (These are in the separate Makefile.targets)
 # They can also be built/cleaned individually: "make gg" and "make gg-clean"
@@ -58,6 +58,11 @@ OBJS        = $(IMAGES:%.png=$(OBJDIR)/%.o) $(CSOURCES:%.c=$(OBJDIR)/%.o) $(ASMS
 
 # Builds all targets sequentially
 all: $(TARGETS)
+
+compile.bat: Makefile
+	@echo "REM Automatically generated from Makefile" > compile.bat
+	@make -sn | sed y/\\//\\\\/ | grep -v make >> compile.bat
+
 
 .SECONDEXPANSION:
 $(OBJDIR)/%.c: $(RESDIR)/%.png $$(wildcard $(RESDIR)/gfx/$(PLAT)/backgrounds/%.png.meta)

@@ -13,6 +13,9 @@
 # TAG += value [value, ...]
 # Values that contain spaces should be placed between quotes (\" \").
 
+# Requires a patched build of doxygen (see patch in same folder)
+USE_READABLE_ANCHORS = YES
+
 #---------------------------------------------------------------------------
 # Project related configuration options
 #---------------------------------------------------------------------------
@@ -746,7 +749,7 @@ FILE_VERSION_FILTER    =
 # tag is left empty.
 
 # LAYOUT_FILE            =
-LAYOUT_FILE            = "$(GBDKDOCSDIR)/config/github-markdown-theme/doxygen_layout.xml"
+# LAYOUT_FILE            = "$(GBDKDOCSDIR)/config/github-markdown-theme/doxygen_layout.xml"
 
 # The CITE_BIB_FILES tag can be used to specify one or more bib files containing
 # the reference definitions. This must be a list of .bib files. The .bib
@@ -1176,7 +1179,8 @@ HTML_FILE_EXTENSION    = .html
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
 # HTML_HEADER            =
-HTML_HEADER        = "$(GBDKDOCSDIR)/config/github-markdown-theme/doxygen_header.html"
+# HTML_HEADER        = "$(GBDKDOCSDIR)/config/github-markdown-theme/doxygen_header.html"
+HTML_HEADER        = "$(GBDKDOCSDIR)/config/doxygen-awesome-theme/doxygen_header.html"
 
 
 # The HTML_FOOTER tag can be used to specify a user-defined HTML footer for each
@@ -1188,7 +1192,7 @@ HTML_HEADER        = "$(GBDKDOCSDIR)/config/github-markdown-theme/doxygen_header
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
 #HTML_FOOTER            =
-HTML_FOOTER        = "$(GBDKDOCSDIR)/config/github-markdown-theme/doxygen_footer.html"
+# HTML_FOOTER        = "$(GBDKDOCSDIR)/config/github-markdown-theme/doxygen_footer.html"
 
 # The HTML_STYLESHEET tag can be used to specify a user-defined cascading style
 # sheet that is used by each HTML page. It can be used to fine-tune the look of
@@ -1216,7 +1220,24 @@ HTML_STYLESHEET        =
 # HTML_EXTRA_STYLESHEET  =
 
 # github-markdown-theme
-HTML_EXTRA_STYLESHEET    = "$(GBDKDOCSDIR)/config/github-markdown-theme/doxygen_extra.css"
+# HTML_EXTRA_STYLESHEET    = "$(GBDKDOCSDIR)/config/github-markdown-theme/doxygen_extra.css"
+
+# Doxygen-Awesome theme
+# Need at least Doxygen 1.9.2 for the responsive mobile menu toggle
+# Per the docs 1.9.5 might have a compat issue
+#
+# These are set elsewhere:
+# GENERATE_TREEVIEW      = YES # optional. Also works without treeview
+# DISABLE_INDEX = NO
+# 
+FULL_SIDEBAR = NO
+HTML_EXTRA_STYLESHEET  = "$(GBDKDOCSDIR)/config/doxygen-awesome-theme/doxygen-awesome.css"
+# Uncomment the next 2 lines to enable the "side bar only theme"
+HTML_EXTRA_STYLESHEET  += "$(GBDKDOCSDIR)/config/doxygen-awesome-theme/doxygen-awesome-sidebar-only.css"
+HTML_EXTRA_STYLESHEET  += "$(GBDKDOCSDIR)/config/doxygen-awesome-theme/doxygen-awesome-sidebar-only-darkmode-toggle.css"
+#
+HTML_COLORSTYLE        = LIGHT # required with Doxygen >= 1.9.5
+
 
 # The HTML_EXTRA_FILES tag can be used to specify one or more extra images or
 # other source files which should be copied to the HTML output directory. Note
@@ -1226,7 +1247,10 @@ HTML_EXTRA_STYLESHEET    = "$(GBDKDOCSDIR)/config/github-markdown-theme/doxygen_
 # files will be copied as-is; there are no commands or markers available.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_EXTRA_FILES       =
+# HTML_EXTRA_FILES       =
+HTML_EXTRA_FILES = "$(GBDKDOCSDIR)/config/doxygen-awesome-theme/doxygen-awesome-darkmode-toggle.js"
+HTML_EXTRA_FILES += "$(GBDKDOCSDIR)/config/doxygen-awesome-theme/doxygen-awesome-paragraph-link.js"
+
 
 # The HTML_COLORSTYLE_HUE tag controls the color of the HTML output. Doxygen
 # will adjust the colors in the style sheet and background images according to

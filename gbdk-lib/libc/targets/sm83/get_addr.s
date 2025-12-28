@@ -3,37 +3,36 @@
 .area _CODE
 
 _get_win_xy_addr::
+        and     #0x1f
+        ld      d, a
         ldh     a, (.LCDC)
         and     #LCDCF_WIN9C00
         jr      z, .is98
         jr      .is9c
 
 _get_bkg_xy_addr::
+        and     #0x1f
+        ld      d, a
         ldh     a, (.LCDC)
         and     #LCDCF_BG9C00
         jr      nz, .is9c
 .is98:
-        ld      d, #0x98        ; DE = origin
+        ld      b, #0x98        ; B = origin
         jr      .calculate_ofs
 .is9c:
-        ld      d, #0x9C        ; DE = origin
+        ld      b, #0x9C        ; B = origin
 
 .calculate_ofs:
-        ldhl    sp, #3
-
-        ld      a, (hl-)
-        ld      l, (hl)
-
-        ld      e, d
+        ld      a, e
         swap    a
         rlca
-        ld      h, a
+        ld      c, a
         and     #0x03
-        add     e
-        ld      d, a
+        or      b
+        ld      b, a
         ld      a, #0xE0
-        and     h
-        add     l
-        ld      e, a            ; dest DE = BASE + 0x20 * Y + X
+        and     c
+        or      d
+        ld      c, a            ; BC = (B << 8) + 0x20 * Y + X
 
         ret

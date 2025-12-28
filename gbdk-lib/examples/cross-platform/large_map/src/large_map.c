@@ -28,7 +28,7 @@
 // they work like this:
 // * Use set_tile_submap for tile indices, to read/write both bytes of map
 // * Make set_submap_attributes a no-op, as attributes were already set
-#define set_submap_indices(x, y, w, h, map, map_w) set_tile_submap(x, y, w, h, map_w, map)
+#define set_submap_indices(x, y, w, h, map, map_w) set_tile_submap(x, y, w, h, map, map_w)
 #define set_submap_attributes(x, y, w, h, map, map_w)
 #else
 #define set_submap_indices(x, y, w, h, map, map_w) set_bkg_submap(x, y, w, h, map, map_w)

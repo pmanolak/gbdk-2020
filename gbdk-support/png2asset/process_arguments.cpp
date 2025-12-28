@@ -7,6 +7,8 @@
 #include <fstream>
 #include <cstdint>
 #include <cstdlib>
+#include <fstream>
+#include <sstream>
 
 #include "lodepng.h"
 #include "mttile.h"
@@ -25,10 +27,36 @@
 #include "png_image.h"
 #include "tiles.h"
 
+#define ARG_SKIP_NONE            0
+#define ARG_AT_INPUT_FILENAME    1
+#define ARG_AFTER_INPUT_FILENAME 2
+
+
 
 using namespace std;
 
-int processPNG2AssetArguments(int argc, char* argv[], PNG2AssetArguments* args) {
+static string str_remove_path(string str_in);
+static void logArguments(int startIndex, int argc, const char* argv[], PNG2AssetArguments* args);
+static void initArguments(PNG2AssetArguments* args);
+static void showHelp(void);
+static int processArguments(int startIndex, int argc, const char* argv[], PNG2AssetArguments* args);
+static int handleMetaFileArgs(PNG2AssetArguments* args);
+
+// Strip any leading path and slashes
+static string str_remove_path(string str_in) {
+    size_t slash_pos = str_in.find_last_of('/');
+    if (slash_pos != str_in.npos)
+        str_in = str_in.substr(slash_pos, str_in.length() - slash_pos);
+
+    slash_pos = str_in.find_last_of('\\');
+    if (slash_pos != str_in.npos)
+        str_in = str_in.substr(slash_pos, str_in.length() - slash_pos);
+
+    return str_in;
+}
+
+
+static void initArguments(PNG2AssetArguments* args) {
 
     //default values for some params
     args->spriteSize.width = 0;
@@ -82,10 +110,14 @@ int processPNG2AssetArguments(int argc, char* argv[], PNG2AssetArguments* args) 
     args->pack_mode = Tile::GB;
     args->map_entry_size_bytes = 1;
 
-    args->relative_paths = false;
+    args->args_for_logging_to_output = "";
 
-    if(argc < 2)
-    {
+    args->relative_paths = false;
+    args->use_metafile = false;
+}
+
+
+void showHelp(void) {
         printf("usage: png2asset    <file>.png [options]\n");
         printf("-o <filename>       ouput file (if not used then default is <png file>.c)\n");
         printf("-c <filename>       deprecated, same as -o\n");
@@ -124,20 +156,27 @@ int processPNG2AssetArguments(int argc, char* argv[], PNG2AssetArguments* args) 
         printf("-keep_duplicate_tiles   do not remove duplicate tiles (default: not enabled)\n");
         printf("-no_palettes        do not export palette data\n");
 
-        printf("-bin                export to binary format\n");
+        printf("-bin                export to binary format (requires -map)\n");
         printf("-transposed         export transposed (column-by-column instead of row-by-row)\n");
 
         printf("-rel_paths          paths to tilesets are relative to the input file path\n");
-        return EXIT_SUCCESS;
-    }
+        printf("-use_metafile       Read extra options from file <inputfile>.meta (file missing not an error)\n");
+}
 
-    //default params
-    args->input_filename = argv[1];
-    args->output_filename = argv[1];
-    args->output_filename = args->output_filename.substr(0, args->output_filename.size() - 4) + ".c";
+
+static void logArguments(int startIndex, int argc, const char* argv[], PNG2AssetArguments* args) {
+ 
+    // Save all args for logging into output files
+    for (int i = startIndex; i < argc; ++i) {
+        args->args_for_logging_to_output.append(" ").append( str_remove_path((string)argv[i]) );
+    }
+}
+
+
+static int processArguments(int startIndex, int argc, const char* argv[], PNG2AssetArguments* args) {
 
     //Parse argv
-    for(int i = 2; i < argc; ++i)
+    for (int i = startIndex; i < argc; ++i)
     {
         if(!strcmp(argv[i], "-sw"))
         {
@@ -325,9 +364,83 @@ int processPNG2AssetArguments(int argc, char* argv[], PNG2AssetArguments* args) 
         else if(!strcmp(argv[i], "-rel_paths")) {
             args->relative_paths = true;
         }
+        else if(!strcmp(argv[i], "-use_metafile")) {
+            args->use_metafile = true;
+        }
         else {
             printf("Warning: Argument \"%s\" not recognized\n", argv[i]);
         }
+    }
+
+    return EXIT_SUCCESS;
+}
+
+
+// Read in and process a set of arguments from a file named <inputfile>.meta
+static int handleMetaFileArgs(PNG2AssetArguments* args) {
+
+    string fname = args->input_filename + ".meta";
+    ifstream metaFile(fname);
+    if ( metaFile )
+    {
+        static vector<string> argStrings;
+        static std::vector<char const*> metafile_argv; // Static for program scope, const to ensure c_str() pointers remain valid        
+
+        // Read file contents
+        stringstream metaFileBuffer;
+        metaFileBuffer << metaFile.rdbuf();
+        metaFile.close();
+
+        // Split strings on spaces/newlines
+        string argEntry;
+        argStrings.clear();
+        while (metaFileBuffer >> argEntry) {
+            argStrings.push_back(argEntry);
+        }
+
+        // Build argv style array
+        int metafile_argc = static_cast<int>(argStrings.size());
+        metafile_argv.clear();
+        metafile_argv.reserve(metafile_argc + 1); // +1 for null terminator entry (optional with our usage)
+        for (const auto& s : argStrings) {
+            metafile_argv.push_back(s.c_str());
+        }
+        metafile_argv.push_back(nullptr);
+
+        // Append args to logged ones and then process them
+        logArguments(ARG_SKIP_NONE, metafile_argc, metafile_argv.data(), args);
+        if (processArguments(ARG_SKIP_NONE, metafile_argc, metafile_argv.data(), args) == EXIT_FAILURE)
+            return EXIT_FAILURE;
+
+    } else {
+        printf("Warning: -use_metafile specified but no meta file found at: %s\n", fname.c_str());
+    }
+
+    return EXIT_SUCCESS;
+}
+
+
+int processPNG2AssetArguments(int argc, char* argv[], PNG2AssetArguments* args) {
+
+    initArguments(args);
+
+    if (argc < 2) {
+        showHelp();
+        return EXIT_SUCCESS;
+    }
+
+    //default params
+    args->input_filename = argv[ARG_AT_INPUT_FILENAME];
+    args->output_filename = argv[ARG_AT_INPUT_FILENAME];
+    args->output_filename = args->output_filename.substr(0, args->output_filename.size() - 4) + ".c";
+
+    logArguments(ARG_AT_INPUT_FILENAME, argc, (const char **)argv, args);
+    if (processArguments(ARG_AFTER_INPUT_FILENAME, argc, (const char **)argv, args) == EXIT_FAILURE)
+        return EXIT_FAILURE;
+
+    if (args->use_metafile) {
+        if (handleMetaFileArgs(args) == EXIT_FAILURE)
+        return EXIT_FAILURE;
     }
 
     int slash_pos = (int)args->output_filename.find_last_of('/');
@@ -339,11 +452,17 @@ int processPNG2AssetArguments(int argc, char* argv[], PNG2AssetArguments* args) 
     args->output_filename_bin = args->output_filename.substr(0, dot_pos) + "_map.bin";
     args->output_filename_attributes_bin = args->output_filename.substr(0, dot_pos) + "_map_attributes.bin";
     args->output_filename_tiles_bin = args->output_filename.substr(0, dot_pos) + "_tiles.bin";
+    args->output_filename_palettes_bin = args->output_filename.substr(0, dot_pos) + "_palettes.bin";
     args->data_name = args->output_filename.substr(slash_pos + 1, dot_pos - 1 - slash_pos);
     replace(args->data_name.begin(), args->data_name.end(), '-', '_');
 
     if ((args->area_specified == true) && (args->bank == BANK_NUM_UNSET)) {
         printf("Error: \"-area\" specified but bank number is missing. A bank number is required, use \"-b\"\n");
+        return EXIT_FAILURE;
+    }
+
+    if((args->output_binary) && (args->export_as_map == false)) {
+        printf("Error: \"-bin\" export mode only works when \"-map\" is enabled\n");
         return EXIT_FAILURE;
     }
 

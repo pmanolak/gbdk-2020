@@ -4,7 +4,7 @@ ifndef GBDK_HOME
 	GBDK_HOME = ../../../
 endif
 
-LCC = $(GBDK_HOME)bin/lcc
+LCC = $(GBDK_HOME)/bin/lcc
 PNG2ASSET = $(GBDK_HOME)/bin/png2asset
 
 # Set platforms to build here, spaced separated. (These are in the separate Makefile.targets)
@@ -57,6 +57,11 @@ OBJS        = $(CSOURCES:%.c=$(OBJDIR)/%.o) $(ASMSOURCES:%.s=$(OBJDIR)/%.o)
 
 # Builds all targets sequentially
 all: $(TARGETS)
+
+compile.bat: Makefile
+	@echo "REM Automatically generated from Makefile" > compile.bat
+	@make -sn | sed y/\\//\\\\/ | grep -v make >> compile.bat
+
 
 # Use png2asset to convert the png into C formatted metasprite data
 # -sh 48   : Sets sprite height to 48 (width remains automatic)

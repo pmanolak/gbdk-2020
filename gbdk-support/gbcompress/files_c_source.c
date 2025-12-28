@@ -188,13 +188,13 @@ bool file_write_c_output_from_buffer(char * filename, uint8_t * p_buf, uint32_t 
 
         // If Bank Num is set add a .h bank ref
         if (bank_num != BANK_NUM_ROM_UNSET) {
+            fprintf(file_out, "#pragma bank %d\n\n", bank_num);
             fprintf(file_out, "#include <gbdk/platform.h>\n\n");
-            fprintf(file_out, "#pragma bank %d\n", bank_num);
             fprintf(file_out, "BANKREF(%s)\n\n", var_name);
         }
 
         // Array entry with variable name
-        fprintf(file_out, "\n\n%s unsigned char %s[] = {", (var_is_const) ? "const" : "", var_name);
+        fprintf(file_out, "%s unsigned char %s[] = {", (var_is_const) ? "const" : "", var_name);
 
         for (i = 0; i < data_len; i++) {
 
@@ -227,7 +227,10 @@ bool file_write_c_output_from_buffer(char * filename, uint8_t * p_buf, uint32_t 
                 FILE * file_out = fopen(filename, "w");
 
                 if (file_out) {
-
+                    // Include guards
+                    fprintf(file_out, "#ifndef GBCOMPRESS_%s_H\n", var_name);
+                    fprintf(file_out, "#define GBCOMPRESS_%s_H\n\n", var_name);
+                    
                     // If Bank Num is set add a .h bank ref
                     if (bank_num != BANK_NUM_ROM_UNSET) {
                         fprintf(file_out, "#include <gbdk/metasprites.h>\n\n");
@@ -238,7 +241,9 @@ bool file_write_c_output_from_buffer(char * filename, uint8_t * p_buf, uint32_t 
                     fprintf(file_out, "#define %s_sz_decomp %d\n", var_name, size_decompressed);
 
                     // array entry with variable name
-                    fprintf(file_out, "\n\nextern %s unsigned char %s[];\n\n", (var_is_const) ? "const" : "", var_name);
+                    fprintf(file_out, "\nextern %s unsigned char %s[];\n\n", (var_is_const) ? "const" : "", var_name);
+
+                    fprintf(file_out, "#endif");
 
                     fclose(file_out);
                 }

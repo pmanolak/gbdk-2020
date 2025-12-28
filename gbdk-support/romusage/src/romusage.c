@@ -19,7 +19,7 @@
 #include "cdb_file.h"
 #include "rom_file.h"
 
-#define VERSION "version 1.3.1"
+#define VERSION "version 1.3.2"
 
 enum {
     HELP_FULL = 0,
@@ -37,6 +37,9 @@ void cleanup(void);
 char filename_in[MAX_STR_LEN] = {'\0'};
 int  show_help_and_exit = false;
 
+static void main_init(void) {
+    show_help_and_exit = false;
+}
 
 static void display_cdb_warning() {
     printf("\n"
@@ -124,14 +127,15 @@ void set_drag_and_drop_mode_defaults(void) {
 int handle_args(int argc, char * argv[]) {
 
     int i;
+    bool filename_present = false;
 
     if( argc < 2 ) {
         display_help(HELP_FULL);
         return false;
     }
 
-    // Start at first optional argument, argc is zero based
-    for (i = 0; i <= (argc -1); i++ ) {
+    // Start at first optional argument ([0] is executable)
+    for (i = 1; i < argc; i++ ) {
 
         if (strstr(argv[i], "-h") == argv[i]) {
             display_help(HELP_FULL);
@@ -239,10 +243,17 @@ int handle_args(int argc, char * argv[]) {
         // Copy input filename (if not preceded with option dash)
         else if (argv[i][0] != '-') {
             snprintf(filename_in, sizeof(filename_in), "%s", argv[i]);
+            filename_present = true;
         }
     }
 
-    return true;
+    if (filename_present) {
+        return true;
+    } else {
+        display_help(HELP_FULL);
+        show_help_and_exit = true;
+        return false;
+    }
 }
 
 
@@ -260,6 +271,10 @@ static bool matches_extension(char * filename, char * extension) {
 
 
 static void init(void) {
+    // The first two are for web mode which needs a reset between runs
+    main_init();
+    options_reset_all();
+
     cdb_init();
     noi_init();
     banks_init();

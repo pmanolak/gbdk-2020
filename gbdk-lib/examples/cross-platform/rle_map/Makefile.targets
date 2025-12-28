@@ -11,6 +11,7 @@ build-target: $(BINS)
 
 clean-target:
 	rm -rf $(OBJDIR)
+	rm -rf $(RESALLDIR)
 	rm -rf $(BINDIR)
 
 gb-clean:

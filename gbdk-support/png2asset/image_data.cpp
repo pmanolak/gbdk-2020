@@ -145,7 +145,7 @@ int ReadImageData_Default(PNG2AssetData* assetData, string  input_filename) {
         return EXIT_FAILURE;
     }
 
-    int* palettes_per_tile = BuildPalettesAndAttributes(image32, assetData->palettes, assetData->args->use_2x2_map_attributes);
+    int* palettes_per_tile = BuildPalettesAndAttributes(image32, assetData);
 
     // Create the indexed image
     // Clearing is needed to ensure loading the png works

@@ -13,8 +13,15 @@ typedef struct file_item {
     bool     rewrite_needed;
     char     name_out[MAX_FILE_STR];
     unsigned int obj_file_format;
+    uint32_t linkerfile_order;
 } file_item;
 
+typedef struct file_order_t {
+    uint32_t file_id;
+    uint32_t linkerfile_order;
+} file_order_t;
+
+#define LINKERFILE_ORDER_FIRST 0
 
 void files_init(void);
 void files_cleanup(void);

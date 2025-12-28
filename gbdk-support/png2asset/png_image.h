@@ -5,6 +5,24 @@ using namespace std;
 
 #define RGBA32_SZ 4 // RGBA 8:8:8:8 is 4 bytes per pixel
 
+// ABGR:8888 (in 8 bit array format, OR RGBA:32 packed int on little-endian systems when accessed as bytes)
+#define ABGR8_R              3 // Alpha channel is [3]
+#define ABGR8_G              2 // Alpha channel in [2]
+#define ABGR8_B              1 // Alpha channel in [1]
+#define ABGR8_ALPHA          0 // Alpha channel in [0]
+
+// RGBA:8888 (in 8 bit array format)
+#define RGBA8_R              0 // Alpha channel is [0]
+#define RGBA8_G              1 // Alpha channel in [1]
+#define RGBA8_B              2 // Alpha channel in [2]
+#define RGBA8_ALPHA          3 // Alpha channel in [3]
+
+#define RGBA32(R,G,B,A) ((R << 24) | (G << 16) | (B << 8) | A)
+#define RGB24(R,G,B)    ((R << 16) | (G << 8) | B)
+
+#define ALPHA_FULLY_TRANSPARENT       0  // Full alpha channel transparency
+#define RGBA32_TRANSPARENT_WHITE      (RGBA32(255,255,255,ALPHA_FULLY_TRANSPARENT))  // White, full transparency
+
 enum {
     SPR_NONE,
     SPR_8x8,

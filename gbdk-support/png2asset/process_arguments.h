@@ -30,6 +30,7 @@ struct PNG2AssetArguments {
     string output_filename_bin;
     string output_filename_attributes_bin;
     string output_filename_tiles_bin;
+    string output_filename_palettes_bin;
     string data_name;
     string output_filename;
     string input_filename;
@@ -55,6 +56,7 @@ struct PNG2AssetArguments {
     bool use_structs;
     bool flip_tiles;
     bool relative_paths;
+    bool use_metafile;
 
     int errorCode;
     int bank;
@@ -70,6 +72,8 @@ struct PNG2AssetArguments {
     bool has_source_tilesets;
     bool has_entity_tileset;
     int processing_mode;  // Whether the current image being processed is a source tileset (MODE_SOURCE_TILESET), entity_tileset (MODE_ENTITY_TILESET), or the main image (MODE_MAIN_IMAGE)
+
+    string args_for_logging_to_output;
 
     Tile::PackMode pack_mode;
     int map_entry_size_bytes;

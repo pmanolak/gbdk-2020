@@ -26,6 +26,9 @@ compare-output:
 clean:
 	rm -rf $(OUTDIR)
 
+clean-ref:
+	rm -rf $(REF)
+
 reset-ref:
 	rm -rf $(REF)
 	git checkout $(REF)/*
@@ -47,7 +50,10 @@ generate-assets:
 	# - GB
 	$(PNG2ASSET) $(RES)/largemap.png -c $(OUTDIR)/zgb_largemap_1.c -b 255 -map -use_structs -noflip
 	# - SMS/GG
-	$(PNG2ASSET) $(RES)/largemap.png -c $(OUTDIR)/zgb_largemap_2.c -b 255 -map -use_structs -noflip -pack_mode sms -bpp 4 -keep_palette_order
+	$(PNG2ASSET) $(RES)/largemap.png -c $(OUTDIR)/zgb_largemap_2.c -b 255 -map -use_structs -pack_mode sms -bpp 4 -keep_palette_order
+	$(PNG2ASSET) $(RES)/largemap.png -c $(OUTDIR)/zgb_largemap_3_attribs_smsgg.c -b 255 -map -use_structs -pack_mode sms -bpp 4 -keep_palette_order -use_map_attributes
+	# - GBC
+	$(PNG2ASSET) $(RES)/largemap.png -c $(OUTDIR)/zgb_largemap_4_attribs_gbc.c -b 255 -map -use_structs -keep_palette_order -use_map_attributes
 
 
 	# gb/duck =   -noflip
@@ -140,12 +146,17 @@ generate-assets:
 # SGB Border
 	$(PNG2ASSET) $(RES)/SGB/sgb_border.png -c $(OUTDIR)/sgb_border_1.c -map -bpp 4 -max_palettes 4 -pack_mode sgb -use_map_attributes
 	$(PNG2ASSET) $(RES)/SGB/sgb_border.png -c $(OUTDIR)/sgb_border_2.c -map -bpp 4 -max_palettes 4 -pack_mode sgb -use_map_attributes -no_palettes
+	$(PNG2ASSET) $(RES)/SGB/sgb_border_multi_pal.png -c $(OUTDIR)/sgb_border_multi_pal.c -map -bpp 4 -max_palettes 4 -pack_mode sgb -use_map_attributes
 
 # -bin output
-	$(PNG2ASSET) $(RES)/gameboy.png -c $(OUTDIR)/binout.1.bin -bin -tiles_only
-	$(PNG2ASSET) $(RES)/gameboy.png -c $(OUTDIR)/binout.2.bin -bin -maps_only
-	$(PNG2ASSET) $(RES)/gameboy.png -c $(OUTDIR)/binout.3.bin -bin -maps_only -no_palettes
+	$(PNG2ASSET) $(RES)/gameboy.png -o $(OUTDIR)/binout_basic.bin         -map -bin
+	$(PNG2ASSET) $(RES)/gameboy.png -o $(OUTDIR)/binout_tileonly.bin      -map -bin -tiles_only
+	$(PNG2ASSET) $(RES)/gameboy.png -o $(OUTDIR)/binout_maponly.bin       -map -bin -maps_only
+	$(PNG2ASSET) $(RES)/gameboy.png -o $(OUTDIR)/binout_maponly-nopal.bin -map -bin -maps_only -no_palettes
 
 # -no_palettes
 	$(PNG2ASSET) $(RES)/no_pal_map_test.png -c $(OUTDIR)/no_pal_map_test_keep_pal_order.c -noflip -map -keep_palette_order -no_palettes
 	$(PNG2ASSET) $(RES)/no_pal_map_test.png -c $(OUTDIR)/no_pal_map_test.c -noflip -map -no_palettes
+
+# -use_metafile
+	$(PNG2ASSET) $(RES)/no_pal_map_test.png -c $(OUTDIR)/no_pal_map_test_keep_pal_order_usemetafile.c -use_metafile

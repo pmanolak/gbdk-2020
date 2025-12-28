@@ -35,6 +35,7 @@ ASSRC =	cgb.s cgb_palettes.s cgb_compat.s \
 	set_tile_submap.s set_win_tile_submap.s \
 	gb_decompress.s gb_decompress_tiles.s \
 	rle_decompress.s \
+	zx0_decompress.s \
 	hblankcpy.s \
 	heap.s \
 	sfr.s \
